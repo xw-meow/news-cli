@@ -43,7 +43,7 @@ export function parseRSS(xml: string, category: string): NewsArticle[] {
   }
 
   return items.map((item: RSSItem) => {
-    const rawTitle = item.title ?? 'Untitled';
+    const rawTitle = item.title?.trim() || 'Untitled';
     // Google News RSS 标题格式: "Article Title - Source Name"
     const sourceFromTitle = extractSourceFromTitle(rawTitle);
     const title = rawTitle.replace(` - ${sourceFromTitle}`, '').trim();
