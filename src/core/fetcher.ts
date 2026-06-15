@@ -68,18 +68,34 @@ export async function fetchRSS(url: string, timeoutMs: number, extraHeaders?: Re
  * @param url - API 地址
  * @param timeoutMs - 超时毫秒数
  * @param extraHeaders - 额外请求头
+ * @param method - HTTP 方法，默认 GET
+ * @param body - 请求体（JSON 字符串）
  * @returns 解析后的 JSON 对象
  */
-export async function fetchJSON<T>(url: string, timeoutMs: number, extraHeaders?: Record<string, string>): Promise<T> {
+export async function fetchJSON<T>(
+  url: string,
+  timeoutMs: number,
+  extraHeaders?: Record<string, string>,
+  method: string = 'GET',
+  body?: string,
+): Promise<T> {
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-      const response = await fetch(url, {
+      const init: RequestInit = {
+        method,
         headers: { 'User-Agent': USER_AGENT, ...extraHeaders },
         signal: controller.signal,
-      });
+      };
+      if (body && method !== 'GET') {
+        (init.headers as Record<string, string>)['Content-Type'] =
+          (init.headers as Record<string, string>)['Content-Type'] || 'application/json';
+        init.body = body;
+      }
+
+      const response = await fetch(url, init);
 
       clearTimeout(timer);
 
