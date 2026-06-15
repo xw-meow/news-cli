@@ -49,6 +49,7 @@ news get <source> --json | jq '.[].title'
 | `weibo` | 微博热搜榜 | 动态 | — |
 | `pengpai` | 澎湃新闻 — 频道+搜索，自动分页 | 22 | `要闻` |
 | `chinanews` | 中国新闻网 — RSS，24 个分类频道 | 24 | `即时新闻` |
+| `sspai` | 少数派 — 派早报/派晚报精选，关键词过滤 | 0 | — |
 
 ### google-news / google-news-cn
 
@@ -71,6 +72,14 @@ news get <source> --json | jq '.[].title'
 中国新闻网 24 个 RSS 分类：
 
 `即时新闻` `要闻导读` `时政新闻` `东西问` `国际新闻` `社会新闻` `财经新闻` `生活` `健康` `大湾区` `华人` `文娱新闻` `体育新闻` `视频` `图片` `创意` `直播` `教育` `法治` `同心` `铸牢中华民族共同体意识` `一带一路` `理论` `中国—东盟商贸资讯平台`
+
+### sspai
+
+少数派编辑部官方账号的派早报/派晚报内容。通过活动列表筛选栏目，逐篇抓取文章详情，将 `body_extends` 子篇拆分为独立新闻。
+
+- 无分类
+- 自动过滤「可能错过的好文章」「少数派的近期动态」「看看就行的简讯」等非新闻栏目
+- 关键词通过 `titleContains` 本地标题匹配
 
 ## 开发
 
@@ -111,10 +120,14 @@ src/
 │   │   ├── index.ts               # 澎湃新闻（22 频道 + 分页 + 关键词）
 │   │   ├── parser.ts              # JSON → NewsArticle[]
 │   │   └── constants.ts           # 频道映射、API URL
-│   └── chinanews/
-│       ├── index.ts               # 中国新闻网（24 个 RSS 分类）
-│       ├── parser.ts              # RSS XML → NewsArticle[]
-│       └── constants.ts           # 分类-RSS URL 映射
+│   ├── chinanews/
+│   │   ├── index.ts               # 中国新闻网（24 个 RSS 分类）
+│   │   ├── parser.ts              # RSS XML → NewsArticle[]
+│   │   └── constants.ts           # 分类-RSS URL 映射
+│   └── sspai/
+│       ├── index.ts               # 少数派（派早报/派晚报，两步 API 抓取）
+│       ├── parser.ts              # JSON → NewsArticle[]，HTML 链接提取
+│       └── constants.ts           # API URL、JWT、栏目/排除关键词
 └── utils/
     ├── logger.ts                  # stderr 日志
     └── keyword-filter.ts          # 标题关键词过滤（所有源复用）
