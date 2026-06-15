@@ -15,12 +15,16 @@
     "lint:fix": "eslint src/ test/ --fix",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["news", "cli"],
+  "keywords": [
+    "news",
+    "cli"
+  ],
   "license": "MIT",
   "dependencies": {
     "cli-table3": "^0.6.5",
     "commander": "^13.1.0",
-    "fast-xml-parser": "^5.2.0"
+    "fast-xml-parser": "^5.2.0",
+    "node-html-parser": "^7.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
