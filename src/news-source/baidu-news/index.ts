@@ -4,22 +4,29 @@ import { fetchRSS } from '../../core/fetcher.js';
 import { parseHTML } from './parser.js';
 import { BASE_URL, SEARCH_URL, CATEGORIES, DEFAULT_TIMEOUT, DEFAULT_LIMIT } from './constants.js';
 
-function buildURL(category: string, keyword?: string): { url: string; base: string } {
+function buildRequest(category: string, keyword?: string): { url: string; base: string; headers: Record<string, string> } {
+  const commonHeaders: Record<string, string> = {
+    'Accept': 'text/html,application/xhtml+xml',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
+    'Referer': 'https://news.baidu.com/',
+  };
+
   if (keyword) {
     const query = keyword.split(',').map((k) => k.trim()).join(' ');
     const encoded = encodeURIComponent(query);
     return {
-      url: `${SEARCH_URL}?word=${encoded}&tn=news&from=news&cl=2&rn=20`,
+      url: `${SEARCH_URL}?word=${encoded}&pn=0&cl=2&ct=0&tn=newstitle&rn=20&ie=utf-8`,
       base: SEARCH_URL,
+      headers: commonHeaders,
     };
   }
 
   const path = CATEGORIES[category];
-  if (path && path !== '/') {
-    return { url: `${BASE_URL}${path}`, base: BASE_URL };
-  }
-
-  return { url: BASE_URL, base: BASE_URL };
+  return {
+    url: path && path !== '/' ? `${BASE_URL}${path}` : BASE_URL,
+    base: BASE_URL,
+    headers: commonHeaders,
+  };
 }
 
 export const baiduNewsSource: NewsSource = {
@@ -41,8 +48,8 @@ export const baiduNewsSource: NewsSource = {
       );
     }
 
-    const { url, base } = buildURL(category, options?.keyword);
-    const html = await fetchRSS(url, DEFAULT_TIMEOUT);
+    const { url, base, headers } = buildRequest(category, options?.keyword);
+    const html = await fetchRSS(url, DEFAULT_TIMEOUT, headers);
     const articles = parseHTML(html, category, base);
 
     const limit = options?.limit ?? DEFAULT_LIMIT;

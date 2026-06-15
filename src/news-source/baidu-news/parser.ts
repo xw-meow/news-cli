@@ -30,6 +30,8 @@ export function parseHTML(html: string, category: string, baseURL: string): News
     // 过滤非新闻链接
     if (href.startsWith('javascript:')) continue;
     if (href === '#' || href.startsWith('#')) continue;
+    // 跳过百度站内搜索链接（热搜侧边栏，非真实新闻）
+    if (href.includes('baidu.com/s?') && href.includes('wd=')) continue;
 
     const title = link.text.trim();
     if (!title || title.length < 6 || title.length > 200) continue;
@@ -73,15 +75,27 @@ export function parseHTML(html: string, category: string, baseURL: string): News
 /** 从文本中提取来源名 */
 function extractSource(parent: ReturnType<typeof htmlParse>, _link: ReturnType<typeof htmlParse>): string | undefined {
   // 常见来源容器选择器
-  const sourceEl = parent.querySelector('.c-author, .source, [class*="source"], [class*="author"], span');
+  const sourceEl = parent.querySelector('.c-author, .source, [class*="source"], [class*="author"], [class*="news-source"], span');
   if (sourceEl) {
     const text = sourceEl.text.trim();
-    // 过滤掉时间文本
-    if (text && !/\d{4}[年/-]/.test(text) && text.length < 20) {
+    if (text && isValidSource(text)) {
       return text;
     }
   }
   return undefined;
+}
+
+/** 过滤明显不是来源名的文本（时间、数字排名等） */
+function isValidSource(text: string): boolean {
+  if (text.length > 30 || text.length === 1) return false;
+  // 纯数字（排名）
+  if (/^\d+$/.test(text)) return false;
+  // 时间格式
+  if (/\d{4}[年/-]/.test(text)) return false;
+  if (/(\d+)(分钟|小时|天)前/.test(text)) return false;
+  // unicode 图标字符
+  if (/[-]/.test(text)) return false;
+  return true;
 }
 
 /** 从文本中提取时间 */

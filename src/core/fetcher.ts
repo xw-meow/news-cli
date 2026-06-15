@@ -16,14 +16,14 @@ async function sleep(ms: number): Promise<void> {
  * @param timeoutMs - 超时毫秒数
  * @returns RSS XML 字符串
  */
-export async function fetchRSS(url: string, timeoutMs: number): Promise<string> {
+export async function fetchRSS(url: string, timeoutMs: number, extraHeaders?: Record<string, string>): Promise<string> {
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
 
       const response = await fetch(url, {
-        headers: { 'User-Agent': USER_AGENT },
+        headers: { 'User-Agent': USER_AGENT, ...extraHeaders },
         signal: controller.signal,
       });
 
