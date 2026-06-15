@@ -17,8 +17,6 @@ async function sleep(ms: number): Promise<void> {
  * @returns RSS XML 字符串
  */
 export async function fetchRSS(url: string, timeoutMs: number): Promise<string> {
-  let lastError: unknown;
-
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const controller = new AbortController();
@@ -40,8 +38,6 @@ export async function fetchRSS(url: string, timeoutMs: number): Promise<string> 
 
       return await response.text();
     } catch (err: unknown) {
-      lastError = err;
-
       // AbortError = timeout
       if (err instanceof DOMException && err.name === 'AbortError') {
         throw new NewsCliError(`Request timeout: ${url}`, 'FETCH_TIMEOUT');
