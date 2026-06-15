@@ -7,13 +7,11 @@ import { RSS_BASE, CATEGORIES, DEFAULT_TIMEOUT, DEFAULT_LIMIT } from './constant
 function buildURL(category: string, keyword?: string): string {
   const topicId = CATEGORIES[category];
 
+  // 关键词搜索：始终使用 /rss/search 端点
   if (keyword) {
     const query = keyword.split(',').map((k) => k.trim()).join(' OR ');
     const encoded = encodeURIComponent(query);
-    const base = topicId
-      ? `${RSS_BASE}/topics/${topicId}`
-      : RSS_BASE;
-    return `${base}?q=${encoded}`;
+    return `${RSS_BASE}/search?q=${encoded}`;
   }
 
   if (topicId) {
