@@ -27,12 +27,22 @@ export function parseHTML(html: string, category: string, baseURL: string): News
     const href = link.getAttribute('href');
     if (!href) continue;
 
-    // 过滤：只保留指向具体新闻文章的链接
-    const title = link.text.trim();
-    if (!title || title.length < 4 || title.length > 200) continue;
+    // 过滤非新闻链接
+    if (href.startsWith('javascript:')) continue;
+    if (href === '#' || href.startsWith('#')) continue;
 
-    // 跳过导航链接
-    if (['首页', '下一页', '上一页', '登录', '注册', '更多'].includes(title)) continue;
+    const title = link.text.trim();
+    if (!title || title.length < 6 || title.length > 200) continue;
+
+    // 跳过导航/UI文字
+    const navTexts = new Set([
+      '首页', '下一页', '上一页', '登录', '注册', '更多', '更多>',
+      '返回首页', '百度首页', '换一换', '换一换', '刷新',
+      '设置', '意见反馈', '投诉', '举报', '分享', '收藏',
+      '查看全部', '加载更多', '展开', '收起', '搜索', '取消',
+    ]);
+    if (navTexts.has(title)) continue;
+    if (title.startsWith('')) continue; // 图标字体
 
     const fullURL = resolveURL(href, baseURL);
     const id = hash(fullURL);
@@ -127,16 +137,17 @@ function parseChineseTime(text: string): string | undefined {
 
 /** 补全相对 URL */
 function resolveURL(href: string, base: string): string {
-  if (href.startsWith('http://') || href.startsWith('https://')) {
-    return href;
+  const trimmed = href.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
   }
-  if (href.startsWith('//')) {
-    return 'https:' + href;
+  if (trimmed.startsWith('//')) {
+    return 'https:' + trimmed;
   }
-  if (href.startsWith('/')) {
-    return base + href;
+  if (trimmed.startsWith('/')) {
+    return base + trimmed;
   }
-  return base + '/' + href;
+  return base + '/' + trimmed;
 }
 
 function hash(input: string): string {
