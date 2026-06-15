@@ -2,6 +2,7 @@ import type { NewsSource, NewsArticle, FetchOptions } from '../../core/types.js'
 import { fetchJSON } from '../../core/fetcher.js';
 import { parseNewsItems } from './parser.js';
 import type { PengpaiChannelResponse, PengpaiSearchResponse, PengpaiNewsItem } from './parser.js';
+import { titleContains } from '../../utils/keyword-filter.js';
 import {
   CHANNEL_CONTENT_URL,
   SEARCH_API_URL,
@@ -101,16 +102,6 @@ async function fetchSearchPaginated(
   }
 
   return all;
-}
-
-function titleContains(article: NewsArticle, keyword: string): boolean {
-  const terms = keyword
-    .split(',')
-    .map((k) => k.trim().toLowerCase())
-    .filter(Boolean);
-  if (terms.length === 0) return true;
-  const t = article.title.toLowerCase();
-  return terms.some((term) => t.includes(term));
 }
 
 export const pengpaiSource: NewsSource = {
