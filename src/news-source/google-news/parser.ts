@@ -15,7 +15,7 @@ interface RSSItem {
 const parser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: '@_',
-  isArray: (_name: string, jpath: string) => jpath === 'rss.channel.item',
+  isArray: (_name: string) => _name === 'item',
 });
 
 /**
@@ -52,7 +52,7 @@ export function parseRSS(xml: string, category: string): NewsArticle[] {
       item.source?.['#text'] ?? sourceFromTitle ?? 'Google News';
 
     return {
-      id: hash(item.link ?? item.guid ?? rawTitle),
+      id: hash(item.link ?? getGuidValue(item.guid) ?? rawTitle),
       title: title || rawTitle,
       url: item.link ?? '',
       source,
@@ -68,6 +68,11 @@ function extractSourceFromTitle(title: string): string | undefined {
   const lastDash = title.lastIndexOf(' - ');
   if (lastDash === -1) return undefined;
   return title.slice(lastDash + 3).trim();
+}
+
+function getGuidValue(guid: string | { '#text': string } | undefined): string | undefined {
+  if (!guid) return undefined;
+  return typeof guid === 'string' ? guid : guid['#text'];
 }
 
 function hash(input: string): string {
