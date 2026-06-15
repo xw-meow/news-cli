@@ -1,39 +1,50 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { pengpaiSource } from '../../../src/news-source/pengpai/index.js';
 
-const mockSearchResponse = {
+const mockChannelPage = {
+  code: 200,
+  data: {
+    hasNext: false,
+    startTime: 1781516538864,
+    list: [
+      {
+        contId: '33382993',
+        name: '北航今年新增两个卓越人才培养试验班',
+        pubTime: '刚刚',
+        pubTimeLong: 1781516538864,
+        nodeInfo: { nodeId: 25487, name: '教育家' },
+      },
+      {
+        contId: '33382760',
+        name: '肺动脉高压新药在沪完成首针',
+        pubTime: '刚刚',
+        pubTimeLong: 1781516538000,
+        nodeInfo: { nodeId: 25422, name: '浦江头条' },
+      },
+    ],
+  },
+};
+
+const mockSearchPage = {
   code: 200,
   data: {
     list: [
       {
-        contId: '33382650',
-        name: '以开放型经济为轴，丽水莲都区多维度编织"全球贸易链接网"',
-        summary: '…摘要内容…',
-        pubTime: '1小时前',
-        pubTimeLong: 1781513621719,
-        pic: 'https://imgpai.thepaper.cn/image.png',
-        nodeInfo: { nodeId: 12345, name: '澎湃浙江' },
-      },
-      {
         contId: '33382600',
         name: '活力中国调研行｜AI硬科技是一个时代机遇',
-        summary: '…主题采访活动期间…',
-        pubTime: '2小时前',
         pubTimeLong: 1781513471394,
-        pic: 'https://imgpai.thepaper.cn/image2.png',
         nodeInfo: { nodeId: 25438, name: '财经上下游' },
       },
       {
         contId: '33382562',
-        name: '华润置地约6.57亿元拍下合肥苏宁广场，项目已停工五年',
-        pubTime: '3小时前',
+        name: '华润置地约6.57亿元拍下合肥苏宁广场',
         pubTimeLong: 1781513332035,
         nodeInfo: { nodeId: 25433, name: '地产界' },
       },
       {
         contId: '33382000',
         name: '无名新闻',
-        // no nodeInfo — no category
+        pubTimeLong: 1781510000000,
       },
     ],
   },
@@ -41,12 +52,24 @@ const mockSearchResponse = {
 
 describe('pengpaiSource', () => {
   beforeEach(() => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify(mockSearchResponse), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }),
-    );
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
+      const urlStr = typeof url === 'string' ? url : url instanceof URL ? url.href : '';
+      const body = (init as RequestInit)?.body as string | undefined;
+
+      if (urlStr.includes('getByChannelId')) {
+        return new Response(JSON.stringify(mockChannelPage), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      if (urlStr.includes('search/web/news')) {
+        return new Response(JSON.stringify(mockSearchPage), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      return new Response('{}', { status: 200 });
+    });
   });
 
   afterEach(() => {
@@ -62,79 +85,60 @@ describe('pengpaiSource', () => {
   });
 
   describe('listCategories', () => {
-    it('should return unique categories from search results', async () => {
+    it('should return 22 categories', async () => {
       const cats = await pengpaiSource.listCategories();
-      expect(cats).toEqual(['地产界', '澎湃浙江', '财经上下游']);
+      expect(cats).toHaveLength(22);
+      expect(cats[0]).toBe('要闻');
     });
 
-    it('should return empty array when API returns no list', async () => {
-      vi.restoreAllMocks();
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response(JSON.stringify({ code: 200, data: {} }), { status: 200 }),
-      );
+    it('should not contain removed channels', async () => {
       const cats = await pengpaiSource.listCategories();
-      expect(cats).toEqual([]);
+      expect(cats).not.toContain('问吧');
+      expect(cats).not.toContain('专题');
     });
   });
 
   describe('fetch', () => {
-    it('should fetch and return articles', async () => {
+    it('should default to 要闻 channel', async () => {
       const articles = await pengpaiSource.fetch();
-      expect(articles).toHaveLength(4);
-      expect(articles[0].title).toContain('丽水莲都区');
+      expect(articles).toHaveLength(2);
+      expect(articles[0].title).toContain('北航');
     });
 
-    it('should filter by category', async () => {
-      const articles = await pengpaiSource.fetch({ category: '地产界' });
-      expect(articles).toHaveLength(1);
-      expect(articles[0].title).toContain('华润置地');
+    it('should use channel API for specified category', async () => {
+      const articles = await pengpaiSource.fetch({ category: '时事' });
+      expect(articles).toHaveLength(2);
     });
 
-    it('should return empty when category matches nothing', async () => {
-      const articles = await pengpaiSource.fetch({ category: '不存在' });
-      expect(articles).toEqual([]);
-    });
-
-    it('should do local keyword filter on title only', async () => {
-      // mock: only 1 article has "AI" in title
+    it('should use search API when only keyword given', async () => {
       const articles = await pengpaiSource.fetch({ keyword: 'AI' });
       expect(articles).toHaveLength(1);
       expect(articles[0].title).toContain('AI');
     });
 
-    it('should support comma-separated OR keyword logic in title', async () => {
-      // "AI硬科技..." has AI, "华润置地..." has 华润 → 2 matches
+    it('should use channel API + keyword filter when both given', async () => {
+      const articles = await pengpaiSource.fetch({ category: '时事', keyword: '北航' });
+      expect(articles).toHaveLength(1);
+      expect(articles[0].title).toContain('北航');
+    });
+
+    it('should support OR keyword', async () => {
       const articles = await pengpaiSource.fetch({ keyword: 'AI,华润' });
       expect(articles).toHaveLength(2);
     });
 
-    it('should combine category and keyword filters', async () => {
-      const articles = await pengpaiSource.fetch({
-        category: '财经上下游',
-        keyword: 'AI',
-      });
+    it('should respect limit', async () => {
+      const articles = await pengpaiSource.fetch({ limit: 1 });
       expect(articles).toHaveLength(1);
-      expect(articles[0].category).toBe('财经上下游');
     });
 
-    it('should respect limit option', async () => {
-      const articles = await pengpaiSource.fetch({ limit: 2 });
-      expect(articles).toHaveLength(2);
-    });
-
-    it('should return empty array when API returns no list', async () => {
+    it('should return empty when API returns no data', async () => {
       vi.restoreAllMocks();
       vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response(JSON.stringify({ code: 200, data: {} }), { status: 200 }),
+        new Response(JSON.stringify({ code: 200, data: null }), { status: 200 }),
       );
       const articles = await pengpaiSource.fetch();
       expect(articles).toEqual([]);
-    });
-
-    it('should include articles without category when no category filter', async () => {
-      const articles = await pengpaiSource.fetch();
-      const withoutCategory = articles.filter((a) => !a.category);
-      expect(withoutCategory).toHaveLength(1);
     });
   });
 });
