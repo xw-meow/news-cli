@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { registerSource } from './core/registry.js';
 import { createCLI } from './cli.js';
 import { googleNewsSource } from './news-source/google-news/index.js';
