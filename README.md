@@ -14,106 +14,63 @@ npm link
 
 ## 使用
 
-### 查看可用源
+所有新闻源共用一套命令模式：
 
 ```bash
+# 列出可用新闻源
 news list
-# google-news:    Google News — global headlines by category
-# google-news-cn: Google News 中国版 — 中文新闻，支持分类和关键词搜索
-# weibo:          微博热搜榜 — 实时热搜，支持按分类和关键词过滤
-# pengpai:        澎湃新闻 — 专注时政与思想，支持22个频道和关键词搜索
+
+# 查看某个源的分类
+news categories <source>
+
+# 获取新闻（默认 20 条，表格输出）
+news get <source>
+
+# 指定分类
+news get <source> -c <category>
+
+# 限制条数
+news get <source> -l 10
+
+# 关键词过滤（逗号分隔 = OR，不区分大小写）
+news get <source> -k "关键词1,关键词2"
+
+# JSON 输出（管道友好）
+news get <source> --json
+news get <source> --json | jq '.[].title'
 ```
 
-### Google News（全球版）
+## 已录入新闻源
 
-```bash
-# 头条
-news get google-news
+| 源名 | 说明 | 分类数 | 默认分类 |
+|------|------|--------|----------|
+| `google-news` | Google News 全球版（英文） | 8 | `headlines` |
+| `google-news-cn` | Google News 中国版（中文） | 8 | `headlines` |
+| `weibo` | 微博热搜榜 | 动态 | — |
+| `pengpai` | 澎湃新闻 — 频道+搜索，自动分页 | 22 | `要闻` |
+| `chinanews` | 中国新闻网 — RSS，24 个分类频道 | 24 | `即时新闻` |
 
-# 按分类过滤
-news get google-news --category technology
+### google-news / google-news-cn
 
-# 关键词搜索（逗号分隔 = OR 关系）
-news get google-news --keyword "AI,GPT"
+全球版与中国版共用同一套分类（中国版参数为中文 locale）：
 
-# 限制条数 + JSON 输出
-news get google-news --category business --limit 10 --json
+`headlines` `world` `business` `technology` `entertainment` `sports` `science` `health`
 
-# 管道友好
-news get google-news --json | jq '.[].title'
-```
+### weibo
 
-### Google News 中国版
+微博实时热搜，分类从 API 动态获取，常见的有：热搜、民生新闻、时事、财经、科技、体育、娱乐、教育 等。
 
-```bash
-# 中文头条
-news get google-news-cn
+### pengpai
 
-# 中文分类
-news get google-news-cn --category technology
+澎湃新闻 22 个频道：
 
-# 中文关键词搜索
-news get google-news-cn --keyword "芯片,半导体" --limit 10 --json
-```
+`要闻` `深度` `直播` `视频` `时事` `国际` `财经` `视听` `科技` `暖闻` `澎湃号` `智库` `思想` `生活` `上海` `奔流` `健康` `体育` `评论` `ESG` `文旅` `短剧`
 
-### 微博热搜
+### chinanews
 
-```bash
-# 实时热搜榜
-news get weibo
+中国新闻网 24 个 RSS 分类：
 
-# 按分类过滤
-news get weibo --category 民生新闻
-
-# 关键词搜索（逗号分隔 = OR 关系）
-news get weibo --keyword "AI,芯片"
-
-# JSON 输出
-news get weibo --limit 10 --json
-```
-
-### 澎湃新闻
-
-```bash
-# 要闻（默认）
-news get pengpai
-
-# 指定频道（共22个）
-news get pengpai --category 财经
-news get pengpai --category 科技
-news get pengpai --category 体育
-
-# 关键词搜索
-news get pengpai --keyword AI
-
-# 频道 + 关键词组合
-news get pengpai --category 财经 --keyword AI --limit 10
-
-# 大批量拉取（自动分页，500ms 间隔防封）
-news get pengpai --limit 100 --json
-```
-
-### 查看分类
-
-```bash
-news categories google-news
-news categories google-news-cn
-news categories weibo
-news categories pengpai
-```
-
-### 可用分类
-
-| 分类 | 参数 |
-|------|------|
-| 头条 | `headlines`（默认） |
-| 国际 | `world` |
-| 商业 | `business` |
-| 科技 | `technology` |
-| 娱乐 | `entertainment` |
-| 体育 | `sports` |
-| 科学 | `science` |
-| 健康 | `health` |
+`即时新闻` `要闻导读` `时政新闻` `东西问` `国际新闻` `社会新闻` `财经新闻` `生活` `健康` `大湾区` `华人` `文娱新闻` `体育新闻` `视频` `图片` `创意` `直播` `教育` `法治` `同心` `铸牢中华民族共同体意识` `一带一路` `理论` `中国—东盟商贸资讯平台`
 
 ## 开发
 
@@ -144,20 +101,25 @@ src/
 │   │   ├── parser.ts              # RSS XML → NewsArticle[]
 │   │   └── constants.ts           # URL 模板、分类定义
 │   ├── google-news-cn/
-│   │   ├── index.ts               # 中国版（中文，复用 parser）
+│   │   ├── index.ts               # 中国版（中文，复用 google-news parser）
 │   │   └── constants.ts           # 中国区 locale 参数
 │   ├── weibo/
 │   │   ├── index.ts               # 微博热搜榜
 │   │   ├── parser.ts              # JSON → NewsArticle[]
 │   │   └── constants.ts           # API URL、默认值
-│   └── pengpai/
-│       ├── index.ts               # 澎湃新闻（22频道 + 分页 + 关键词）
-│       ├── parser.ts              # JSON → NewsArticle[]
-│       └── constants.ts           # 频道映射、API URL
+│   ├── pengpai/
+│   │   ├── index.ts               # 澎湃新闻（22 频道 + 分页 + 关键词）
+│   │   ├── parser.ts              # JSON → NewsArticle[]
+│   │   └── constants.ts           # 频道映射、API URL
+│   └── chinanews/
+│       ├── index.ts               # 中国新闻网（24 个 RSS 分类）
+│       ├── parser.ts              # RSS XML → NewsArticle[]
+│       └── constants.ts           # 分类-RSS URL 映射
 └── utils/
-    └── logger.ts                  # stderr 日志
+    ├── logger.ts                  # stderr 日志
+    └── keyword-filter.ts          # 标题关键词过滤（所有源复用）
 
-test/                              # vitest 测试用例 (104 tests)
+test/                              # vitest 测试用例 (128 tests)
 scripts/build.js                   # esbuild 构建脚本
 ```
 
