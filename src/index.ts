@@ -11,6 +11,7 @@ import { clsSource } from './news-source/cls/index.js';
 import { aibaseSource } from './news-source/aibase/index.js';
 import { tencentNewsSource } from './news-source/tencent-news/index.js';
 import { kr36Source } from './news-source/36kr/index.js';
+import { peopleCnSource } from './news-source/people-cn/index.js';
 
 // 注册所有新闻源
 registerSource(googleNewsSource);
@@ -24,6 +25,7 @@ registerSource(clsSource);
 registerSource(aibaseSource);
 registerSource(tencentNewsSource);
 registerSource(kr36Source);
+registerSource(peopleCnSource);
 
 // 启动 CLI
 const program = createCLI();
