@@ -2,7 +2,7 @@ import type { NewsSource, NewsArticle, FetchOptions } from '../../core/types.js'
 import { NewsCliError } from '../../core/types.js';
 import { fetchRSS } from '../../core/fetcher.js';
 import { parseRSS } from './parser.js';
-import { titleContains } from '../../utils/keyword-filter.js';
+import { titleContains } from '../../utils/index.js';
 import { CATEGORIES, DEFAULT_CATEGORY, DEFAULT_TIMEOUT, DEFAULT_LIMIT } from './constants.js';
 
 export const chinanewsSource: NewsSource = {

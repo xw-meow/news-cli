@@ -1,7 +1,7 @@
 import type { NewsSource, NewsArticle, FetchOptions } from '../../core/types.js';
 import { fetchHTML } from '../../core/fetcher.js';
 import { parseArticles, getLastDataOt } from './parser.js';
-import { titleContains } from '../../utils/keyword-filter.js';
+import { titleContains } from '../../utils/index.js';
 import {
   CATEGORIES,
   DOMAINPAGE_URL,

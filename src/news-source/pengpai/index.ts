@@ -2,7 +2,7 @@ import type { NewsSource, NewsArticle, FetchOptions } from '../../core/types.js'
 import { fetchJSON } from '../../core/fetcher.js';
 import { parseNewsItems } from './parser.js';
 import type { PengpaiChannelResponse, PengpaiSearchResponse, PengpaiNewsItem } from './parser.js';
-import { titleContains } from '../../utils/keyword-filter.js';
+import { titleContains, sleep } from '../../utils/index.js';
 import {
   CHANNEL_CONTENT_URL,
   SEARCH_API_URL,
@@ -15,10 +15,6 @@ import {
 const PAGE_SIZE = 20;
 const DELAY_MS = 500;
 const headers = { Referer: REFERER };
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((r) => setTimeout(r, ms));
-}
 
 /** 频道 API 分页拉取 */
 async function fetchChannelPaginated(

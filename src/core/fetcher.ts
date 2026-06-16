@@ -1,14 +1,11 @@
 import { NewsCliError } from './types.js';
+import { sleep } from '../utils/index.js';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
 
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
-
-async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 /**
  * 通用文本抓取：超时控制 + 重试 + UA 伪装

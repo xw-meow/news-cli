@@ -1,6 +1,6 @@
 import type { NewsSource, NewsArticle, FetchOptions } from '../../core/types.js';
 import { fetchJSON } from '../../core/fetcher.js';
-import { titleContains } from '../../utils/keyword-filter.js';
+import { titleContains } from '../../utils/index.js';
 import {
   filterCornerArticles,
   parseBodyExtends,

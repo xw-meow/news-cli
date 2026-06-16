@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { titleContains } from '../../src/utils/keyword-filter.js';
+import { titleContains } from '../../src/utils/index.js';
 import type { NewsArticle } from '../../src/core/types.js';
 
 function makeArticle(title: string): NewsArticle {
