@@ -4,12 +4,12 @@ import type { NewsArticle } from '../../core/types.js';
 /** 36kr 单篇文章 item（API 返回 itemList 中的元素） */
 export interface KrNewsItem {
     itemId?: number;
+    route?: string; // e.g. "detail_article?itemId=2821906838505733"
     templateMaterial?: {
         widgetTitle?: string;
-        widgetUrl?: string;
         widgetImage?: string;
         publishTime?: number; // ms timestamp
-        snippet?: string;
+        summary?: string;
     };
 }
 
@@ -41,6 +41,14 @@ function parsePublishTime(ms: number): string | undefined {
 /**
  * 将 36kr API 返回的 itemList 解析为 NewsArticle[]
  */
+/** 从 route 提取 itemId 构建文章 URL */
+function buildUrl(route: string, itemId?: number): string {
+    // route 格式: "detail_article?itemId=2821906838505733"
+    const match = route.match(/itemId=(\d+)/);
+    const id = match ? match[1] : String(itemId ?? '');
+    return `https://36kr.com/p/${id}`;
+}
+
 export function parseArticles(
     items: KrNewsItem[],
     category: string,
@@ -48,12 +56,12 @@ export function parseArticles(
     return items
         .filter((item) => {
             const tm = item.templateMaterial;
-            return !!(tm?.widgetTitle && tm?.widgetUrl);
+            return !!(tm?.widgetTitle && item.route);
         })
         .map((item) => {
             const tm = item.templateMaterial!;
             const title = tm.widgetTitle?.trim() || 'Untitled';
-            const url = tm.widgetUrl!;
+            const url = buildUrl(item.route!, item.itemId);
             const publishedAt = tm.publishTime
                 ? parsePublishTime(tm.publishTime)
                 : undefined;
@@ -63,7 +71,7 @@ export function parseArticles(
                 title,
                 url,
                 source: '36氪',
-                snippet: tm.snippet?.trim() || undefined,
+                snippet: tm.summary?.trim() || undefined,
                 publishedAt,
                 category,
                 imageUrl: tm.widgetImage || undefined,

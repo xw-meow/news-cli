@@ -8,30 +8,30 @@ const mockResponse: KrApiResponse = {
         itemList: [
             {
                 itemId: 1001,
+                route: 'detail_article?itemId=123456',
                 templateMaterial: {
                     widgetTitle: '马斯克敲钟前激动讲话：SpaceX的使命',
-                    widgetUrl: 'https://36kr.com/p/123456',
                     widgetImage: 'https://img.36kr.com/abc.jpg',
                     publishTime: 1718548800000,
-                    snippet: 'SpaceX完成史上最大规模IPO',
+                    summary: 'SpaceX完成史上最大规模IPO',
                 },
             },
             {
                 itemId: 1002,
+                route: 'detail_article?itemId=789012',
                 templateMaterial: {
                     widgetTitle: 'AI应用层的泡沫被戳破',
-                    widgetUrl: 'https://36kr.com/p/789012',
                     publishTime: 1718559600000,
-                    snippet: '生成式AI爆发三年半后进入分歧点',
+                    summary: '生成式AI爆发三年半后进入分歧点',
                 },
             },
             {
                 itemId: 1003,
+                route: 'detail_article?itemId=345678',
                 templateMaterial: {
                     widgetTitle: '英伟达市值突破',
-                    widgetUrl: 'https://36kr.com/p/345678',
                     publishTime: 1718563200000,
-                    snippet: '英伟达市值突破6万亿美元',
+                    summary: '英伟达市值突破6万亿美元',
                 },
             },
         ],
@@ -40,11 +40,13 @@ const mockResponse: KrApiResponse = {
 
 describe('kr36Source', () => {
     beforeEach(() => {
-        vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-            new Response(JSON.stringify(mockResponse), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            }),
+        vi.spyOn(globalThis, 'fetch').mockImplementation(() =>
+            Promise.resolve(
+                new Response(JSON.stringify(mockResponse), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' },
+                }),
+            ),
         );
     });
 
@@ -61,24 +63,25 @@ describe('kr36Source', () => {
     });
 
     describe('listCategories', () => {
-        it('should return 6 categories', async () => {
+        it('should return 17 categories', async () => {
             const cats = await kr36Source.listCategories();
-            expect(cats).toHaveLength(6);
-            expect(cats).toContain('资讯');
+            expect(cats).toHaveLength(17);
+            expect(cats).toContain('最新');
             expect(cats).toContain('推荐');
-            expect(cats).toContain('企服');
+            expect(cats).toContain('创投');
+            expect(cats).toContain('财经');
+            expect(cats).toContain('AI');
             expect(cats).toContain('科技');
-            expect(cats).toContain('金融');
-            expect(cats).toContain('创业');
+            expect(cats).toContain('企服');
         });
     });
 
     describe('fetch', () => {
-        it('should fetch articles defaulting to 资讯', async () => {
+        it('should fetch articles defaulting to 最新', async () => {
             const articles = await kr36Source.fetch();
             expect(articles).toHaveLength(3);
             expect(articles[0].title).toContain('马斯克');
-            expect(articles[0].category).toBe('资讯');
+            expect(articles[0].category).toBe('最新');
             expect(articles[0].source).toBe('36氪');
         });
 
@@ -88,7 +91,7 @@ describe('kr36Source', () => {
         });
 
         it('should support category selection by subnavNick', async () => {
-            const articles = await kr36Source.fetch({ category: 'web_tech' });
+            const articles = await kr36Source.fetch({ category: 'technology' });
             expect(articles[0].category).toBe('科技');
         });
 
@@ -110,15 +113,17 @@ describe('kr36Source', () => {
 
         it('should fallback to default for unknown category', async () => {
             const articles = await kr36Source.fetch({ category: '未知' });
-            expect(articles[0].category).toBe('资讯');
+            expect(articles[0].category).toBe('最新');
         });
 
         it('should return empty when API returns no data', async () => {
             vi.restoreAllMocks();
-            vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-                new Response(JSON.stringify({ code: 0, data: { itemList: [] } }), {
-                    status: 200,
-                }),
+            vi.spyOn(globalThis, 'fetch').mockImplementation(() =>
+                Promise.resolve(
+                    new Response(JSON.stringify({ code: 0, data: { itemList: [] } }), {
+                        status: 200,
+                    }),
+                ),
             );
             const articles = await kr36Source.fetch();
             expect(articles).toEqual([]);
@@ -126,10 +131,12 @@ describe('kr36Source', () => {
 
         it('should return empty when API returns null data', async () => {
             vi.restoreAllMocks();
-            vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-                new Response(JSON.stringify({ code: 0, data: null }), {
-                    status: 200,
-                }),
+            vi.spyOn(globalThis, 'fetch').mockImplementation(() =>
+                Promise.resolve(
+                    new Response(JSON.stringify({ code: 0, data: null }), {
+                        status: 200,
+                    }),
+                ),
             );
             const articles = await kr36Source.fetch();
             expect(articles).toEqual([]);
