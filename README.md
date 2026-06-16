@@ -55,6 +55,7 @@ news get <source> --json | jq '.[].title'
 | `aibase` | AIbase — AI 领域最新资讯，分页抓取 | 0 | — |
 | `tencent-news` | 腾讯新闻 — POST API，5 个频道 | 5 | `科技/AI` |
 | `36kr` | 36氪 — POST API 翻页，17 个频道 | 17 | `最新` |
+| `people-cn` | 人民网 — 每日要闻回顾，HTML 解析 + 日期回溯 | 0 | — |
 
 ### google-news / google-news-cn
 
@@ -130,6 +131,14 @@ AIbase JSON API 抓取，无分类，通过 `pageNo` 递增分页。
 - 频道 ID 从 36kr 网站导航页提取，请求体中 `subnavNick` 区分频道
 - 文章 URL 由 `route` 字段提取 itemId 拼接（`https://36kr.com/p/<itemId>`）
 
+### people-cn
+
+人民网每日要闻回顾，HTML 直接解析。抓取 `review/YYYYMMDD.html` 页面中的「今日要闻」部分。
+
+- 无分类
+- 从当天开始逐日回溯，最多 7 天，直到凑够 limit 条
+- 纯 regex 解析 `<li><a>标题</a> [时间戳]</li>` 结构，无第三方 DOM 依赖
+
 ## 开发
 
 ```bash
@@ -198,11 +207,15 @@ src/
 │       ├── index.ts               # 36氪（JSON POST API，17 个频道，翻页）
 │       ├── parser.ts              # JSON → NewsArticle[]
 │       └── constants.ts           # subnavNick 频道映射、API 配置
+│   └── people-cn/
+│       ├── index.ts               # 人民网（HTML 解析 + 日期回溯）
+│       ├── parser.ts              # HTML regex → NewsArticle[]
+│       └── constants.ts           # URL 模板、回溯天数
 └── utils/
     ├── index.ts                   # 公共工具：sleep() / titleContains()
     └── logger.ts                  # stderr 日志
 
-test/                              # vitest 测试用例 (234 tests)
+test/                              # vitest 测试用例 (256 tests)
 scripts/build.js                   # esbuild 构建脚本
 ```
 
