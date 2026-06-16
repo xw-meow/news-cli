@@ -6,6 +6,7 @@ import { weiboSource } from './news-source/weibo/index.js';
 import { pengpaiSource } from './news-source/pengpai/index.js';
 import { chinanewsSource } from './news-source/chinanews/index.js';
 import { sspaiSource } from './news-source/sspai/index.js';
+import { ithomeSource } from './news-source/ithome/index.js';
 
 // 注册所有新闻源
 registerSource(googleNewsSource);
@@ -14,6 +15,7 @@ registerSource(weiboSource);
 registerSource(pengpaiSource);
 registerSource(chinanewsSource);
 registerSource(sspaiSource);
+registerSource(ithomeSource);
 
 // 启动 CLI
 const program = createCLI();

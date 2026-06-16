@@ -50,6 +50,7 @@ news get <source> --json | jq '.[].title'
 | `pengpai` | 澎湃新闻 — 频道+搜索，自动分页 | 22 | `要闻` |
 | `chinanews` | 中国新闻网 — RSS，24 个分类频道 | 24 | `即时新闻` |
 | `sspai` | 少数派 — 派早报/派晚报精选，关键词过滤 | 0 | — |
+| `ithome` | IT之家 — 前沿科技新闻，支持20个分类 | 20 | `业界` |
 
 ### google-news / google-news-cn
 
@@ -80,6 +81,14 @@ news get <source> --json | jq '.[].title'
 - 无分类
 - 自动过滤「可能错过的好文章」「少数派的近期动态」「看看就行的简讯」等非新闻栏目
 - 关键词通过 `titleContains` 本地标题匹配
+
+### ithome
+
+IT之家首页 HTML 解析，无需 RSS/API。进入各分类页面直接抓取新闻列表，支持 AJAX 分页补足。
+
+20 个分类：
+
+`业界` `手机` `电脑` `测评` `视频` `AI` `苹果` `iPhone` `鸿蒙` `软件` `智车` `数码` `学院` `游戏` `直播` `5G` `微软` `Win10` `Win11` `专题`
 
 ## 开发
 
@@ -128,11 +137,15 @@ src/
 │       ├── index.ts               # 少数派（派早报/派晚报，两步 API 抓取）
 │       ├── parser.ts              # JSON → NewsArticle[]，HTML 链接提取
 │       └── constants.ts           # API URL、JWT、栏目/排除关键词
+│   └── ithome/
+│       ├── index.ts               # IT之家（HTML 解析 + AJAX 分页，20 个分类）
+│       ├── parser.ts              # HTML regex → NewsArticle[]
+│       └── constants.ts           # 分类-URL-domain 映射
 └── utils/
     ├── logger.ts                  # stderr 日志
     └── keyword-filter.ts          # 标题关键词过滤（所有源复用）
 
-test/                              # vitest 测试用例 (128 tests)
+test/                              # vitest 测试用例 (152 tests)
 scripts/build.js                   # esbuild 构建脚本
 ```
 

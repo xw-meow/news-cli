@@ -11,12 +11,12 @@ async function sleep(ms: number): Promise<void> {
 }
 
 /**
- * 通用 RSS 抓取：超时控制 + 重试 + UA 伪装
- * @param url - RSS 地址
+ * 通用文本抓取：超时控制 + 重试 + UA 伪装
+ * @param url - 请求地址
  * @param timeoutMs - 超时毫秒数
- * @returns RSS XML 字符串
+ * @returns 响应文本
  */
-export async function fetchRSS(url: string, timeoutMs: number, extraHeaders?: Record<string, string>): Promise<string> {
+async function fetchText(url: string, timeoutMs: number, extraHeaders?: Record<string, string>): Promise<string> {
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const controller = new AbortController();
@@ -60,7 +60,27 @@ export async function fetchRSS(url: string, timeoutMs: number, extraHeaders?: Re
     }
   }
 
-  throw new NewsCliError(`Unexpected: fetchRSS exhausted retries for ${url}`, 'FETCH_FAILED');
+  throw new NewsCliError(`Unexpected: fetchText exhausted retries for ${url}`, 'FETCH_FAILED');
+}
+
+/**
+ * 通用 RSS 抓取：超时控制 + 重试 + UA 伪装
+ * @param url - RSS 地址
+ * @param timeoutMs - 超时毫秒数
+ * @returns RSS XML 字符串
+ */
+export async function fetchRSS(url: string, timeoutMs: number, extraHeaders?: Record<string, string>): Promise<string> {
+  return fetchText(url, timeoutMs, extraHeaders);
+}
+
+/**
+ * 通用 HTML 页面抓取：超时控制 + 重试 + UA 伪装
+ * @param url - 页面地址
+ * @param timeoutMs - 超时毫秒数
+ * @returns HTML 字符串
+ */
+export async function fetchHTML(url: string, timeoutMs: number, extraHeaders?: Record<string, string>): Promise<string> {
+  return fetchText(url, timeoutMs, extraHeaders);
 }
 
 /**
