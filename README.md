@@ -54,6 +54,7 @@ news get <source> --json | jq '.[].title'
 | `cls` | 财联社 — 专业财经资讯，支持热点和头条 | 2 | `热点` |
 | `aibase` | AIbase — AI 领域最新资讯，分页抓取 | 0 | — |
 | `tencent-news` | 腾讯新闻 — POST API，5 个频道 | 5 | `科技/AI` |
+| `36kr` | 36氪 — POST API 翻页，17 个频道 | 17 | `最新` |
 
 ### google-news / google-news-cn
 
@@ -120,6 +121,15 @@ AIbase JSON API 抓取，无分类，通过 `pageNo` 递增分页。
 - 翻页分页机制在该接口上返回重复数据，因此单次拉取即可满足需求
 - 文章 URL 优先使用 `link_info.url`，回退到 `share_url`
 
+### 36kr
+
+36氪 JSON POST API，从 pageCallback base64 游标翻页，最多每页 30 条，按 itemId 去重。
+
+17 个频道：`最新` `推荐` `创投` `财经` `汽车` `AI` `科技` `自助报道` `专精特新` `创新` `企服` `消费` `城市` `职场` `企业号` `红人` `其他`
+
+- 频道 ID 从 36kr 网站导航页提取，请求体中 `subnavNick` 区分频道
+- 文章 URL 由 `route` 字段提取 itemId 拼接（`https://36kr.com/p/<itemId>`）
+
 ## 开发
 
 ```bash
@@ -184,11 +194,15 @@ src/
 │       ├── index.ts               # 腾讯新闻（JSON POST API，5 个频道）
 │       ├── parser.ts              # JSON → NewsArticle[]
 │       └── constants.ts           # channel_id 映射、API 配置
+│   └── 36kr/
+│       ├── index.ts               # 36氪（JSON POST API，17 个频道，翻页）
+│       ├── parser.ts              # JSON → NewsArticle[]
+│       └── constants.ts           # subnavNick 频道映射、API 配置
 └── utils/
     ├── index.ts                   # 公共工具：sleep() / titleContains()
     └── logger.ts                  # stderr 日志
 
-test/                              # vitest 测试用例 (212 tests)
+test/                              # vitest 测试用例 (234 tests)
 scripts/build.js                   # esbuild 构建脚本
 ```
 
