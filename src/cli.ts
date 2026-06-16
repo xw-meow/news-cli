@@ -22,8 +22,14 @@ export function createCLI(): Command {
         process.stdout.write('(no sources available)\n');
         return;
       }
+
+      const nameWidth = Math.max(...sources.map((s) => s.name.length));
+      const prefixWidth = nameWidth + 4; // 2-char indent + 2-char gap
+
       for (const s of sources) {
-        process.stdout.write(`${s.name}: ${s.description}\n`);
+        const nameCol = `  ${s.name}`;
+        const padding = prefixWidth - nameCol.length;
+        process.stdout.write(`${nameCol}${' '.repeat(Math.max(padding, 2))}${s.description}\n`);
       }
     });
 
