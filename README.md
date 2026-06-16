@@ -56,6 +56,7 @@ news get <source> --json | jq '.[].title'
 | `tencent-news` | 腾讯新闻 — POST API，5 个频道 | 5 | `科技/AI` |
 | `36kr` | 36氪 — POST API 翻页，17 个频道 | 17 | `最新` |
 | `people-cn` | 人民网 — 每日要闻回顾，HTML 解析 + 日期回溯 | 0 | — |
+| `huxiu` | 虎嗅网 — 商业科技资讯，POST API 翻页，14 个频道 | 14 | `全部` |
 
 ### google-news / google-news-cn
 
@@ -139,6 +140,18 @@ AIbase JSON API 抓取，无分类，通过 `pageNo` 递增分页。
 - 从当天开始逐日回溯，最多 7 天，直到凑够 limit 条
 - 纯 regex 解析 `<li><a>标题</a> [时间戳]</li>` 结构，无第三方 DOM 依赖
 
+### huxiu
+
+虎嗅网 JSON POST API，`last_id` 游标翻页，按 `aid` 去重。
+
+14 个频道：
+
+`全部` `前沿科技` `车与出行` `商业消费` `社会文化` `金融财经` `出海` `国际热点` `游戏娱乐` `健康` `书影音` `医疗` `3C数码` `观点` `其他`
+
+- 频道列表从 API 动态获取，运行时也可回退到硬编码常量
+- `pagesize=20` 每页，游标翻页直到凑够 limit 或无更多数据
+- 文章 URL 优先使用 API 返回的 `url` 字段，回退到 `https://www.huxiu.com/article/{aid}.html`
+
 ## 开发
 
 ```bash
@@ -211,11 +224,15 @@ src/
 │       ├── index.ts               # 人民网（HTML 解析 + 日期回溯）
 │       ├── parser.ts              # HTML regex → NewsArticle[]
 │       └── constants.ts           # URL 模板、回溯天数
+│   └── huxiu/
+│       ├── index.ts               # 虎嗅网（JSON POST API，游标翻页）
+│       ├── parser.ts              # JSON → NewsArticle[]
+│       └── constants.ts           # 频道映射、API 配置
 └── utils/
     ├── index.ts                   # 公共工具：sleep() / titleContains()
     └── logger.ts                  # stderr 日志
 
-test/                              # vitest 测试用例 (256 tests)
+test/                              # vitest 测试用例 (280 tests)
 scripts/build.js                   # esbuild 构建脚本
 ```
 
