@@ -52,9 +52,8 @@ const mockSearchPage = {
 
 describe('pengpaiSource', () => {
   beforeEach(() => {
-    vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, _init) => {
       const urlStr = typeof url === 'string' ? url : url instanceof URL ? url.href : '';
-      const body = (init as RequestInit)?.body as string | undefined;
 
       if (urlStr.includes('getByChannelId')) {
         return new Response(JSON.stringify(mockChannelPage), {

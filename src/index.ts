@@ -8,6 +8,7 @@ import { chinanewsSource } from './news-source/chinanews/index.js';
 import { sspaiSource } from './news-source/sspai/index.js';
 import { ithomeSource } from './news-source/ithome/index.js';
 import { clsSource } from './news-source/cls/index.js';
+import { aibaseSource } from './news-source/aibase/index.js';
 
 // 注册所有新闻源
 registerSource(googleNewsSource);
@@ -18,6 +19,7 @@ registerSource(chinanewsSource);
 registerSource(sspaiSource);
 registerSource(ithomeSource);
 registerSource(clsSource);
+registerSource(aibaseSource);
 
 // 启动 CLI
 const program = createCLI();
