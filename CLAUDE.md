@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev          # tsx hot-run src/index.ts
 npm run build        # esbuild → dist/index.js (single ESM bundle, shebang, deps external)
-npm test             # vitest run (41 tests)
+npm test             # vitest run (234 tests, 24 files)
 npm run test:watch   # vitest watch mode
 npm run lint         # ESLint (flat config, TS + recommended rules)
 npm run lint:fix     # ESLint auto-fix
@@ -42,19 +42,45 @@ Errors go to **stderr** via `utils/logger.ts`; data goes to **stdout**. This mak
 
 ### Fetcher (`src/core/fetcher.ts`)
 
-`fetchRSS(url, timeoutMs, extraHeaders?)` — up to 3 retries with 1s delay, AbortController timeout, Chrome UA. Used by all RSS-based sources.
+All fetch functions share the same retry/timeout logic: up to 3 retries with 1s delay, AbortController timeout, Chrome UA. Four exports:
 
-### RSS Parser (`src/news-source/google-news/parser.ts`)
+- **`fetchRSS(url, timeoutMs, extraHeaders?)`** — GET, returns raw text. Used by RSS-based sources (google-news, chinanews).
+- **`fetchHTML(url, timeoutMs, extraHeaders?)`** — GET, returns raw text. Used by HTML-scraping sources (ithome).
+- **`fetchJSON<T>(url, timeoutMs, extraHeaders?, method?, body?)`** — generic JSON fetch with optional POST method and JSON body. Used by API-based sources: GET (weibo, cls, pengpai, aibase), POST (tencent-news, 36kr).
+- **`fetchText(url, timeoutMs, extraHeaders?)`** — internal, not exported. All three public functions delegate to it.
 
-`parseRSS(xml, category)` — uses `fast-xml-parser` with `isArray` for `<item>`. Parses Google News's "Title - Source Name" format: splits on last `" - "` to extract source, remainder becomes title. Strips HTML from descriptions. Unique IDs via SHA-256 hash of URL.
+Errors are thrown as `NewsCliError` with `FETCH_TIMEOUT` or `FETCH_FAILED` codes.
 
-### Google News CN reuse pattern
+### Source implementation patterns
 
-`google-news-cn` reuses `google-news/parser.js` directly (same RSS structure) but has its own `constants.ts` with `LOCALE_PARAMS = 'hl=zh-CN&gl=CN&ceid=CN:zh-Hans'` appended to all URLs. This is the intended pattern for locale variants — share the parser, vary the constants.
+Sources follow one of these patterns. When adding a new source, pick the closest match:
 
-### URL construction
+| Pattern | Sources | Fetch | Parse |
+|---------|---------|-------|-------|
+| **RSS** | google-news, google-news-cn, chinanews | `fetchRSS()` | `fast-xml-parser` → `NewsArticle[]` |
+| **JSON GET** | weibo, cls, pengpai, aibase | `fetchJSON<T>()` | typed JSON → `NewsArticle[]` |
+| **JSON POST** | tencent-news, 36kr | `fetchJSON<T>(url, ms, headers, 'POST', body)` | typed JSON → `NewsArticle[]` |
+| **HTML scrape** | ithome | `fetchHTML()` | regex extraction |
+| **Multi-step API** | sspai | `fetchJSON<T>()` × N | fetch list → fetch each article detail |
 
-Categories map to opaque Google News topic IDs (base64-encoded protobuf-like strings). Keyword search uses `/rss/search?q=<OR-joined terms>`. Without keyword: `/rss/topics/<topicId>`. Default (headlines): bare `/rss`.
+**Pagination strategies vary by source:**
+- Google News RSS: single request (RSS returns all available items)
+- pengpai: `loadPage` parameter, loops until enough items or empty page
+- 36kr: base64-encoded `pageCallback` cursor, de-duplicates by itemId
+- cls: `last_time` cursor on 头条 endpoint
+- aibase: simple `pageNo` increment
+- ithome: AJAX pagination via additional HTML requests
+- tencent-news: single POST with `item_count` (pagination returns duplicates, so single request only)
+
+### Utils (`src/utils/`)
+
+- **`sleep(ms)`** — promise-based delay, used by fetcher retry logic and between paginated requests.
+- **`titleContains(article, keyword)`** — OR-based keyword matching: splits on comma, trims, lowercases, checks if any term appears in `article.title`. Used by most sources for client-side keyword filtering after fetch.
+- **`logger.ts`** — writes to stderr via `error()` and `info()` exports. Keeps stdout clean for pipe-safe `--json` output.
+
+### Parser pattern
+
+Each source has its own `parser.ts` that converts its raw format to `NewsArticle[]`. All parsers generate IDs via SHA-256 hash of the article URL (first 12 hex chars). The Google News parser (`google-news/parser.ts`) is the most complex — it splits "Title - Source Name" format and strips HTML from descriptions. It's reused directly by `google-news-cn` via import (same RSS structure, different locale params).
 
 ### Build
 
