@@ -53,6 +53,7 @@ news get <source> --json | jq '.[].title'
 | `ithome` | IT之家 — 前沿科技新闻，支持20个分类 | 20 | `业界` |
 | `cls` | 财联社 — 专业财经资讯，支持热点和头条 | 2 | `热点` |
 | `aibase` | AIbase — AI 领域最新资讯，分页抓取 | 0 | — |
+| `tencent-news` | 腾讯新闻 — POST API，5 个频道 | 5 | `科技/AI` |
 
 ### google-news / google-news-cn
 
@@ -108,6 +109,16 @@ AIbase JSON API 抓取，无分类，通过 `pageNo` 递增分页。
 - 无分类
 - 文章详情 URL：`https://news.aibase.com/zh/news/:oid`
 - `createTime` 字段为本地时间字符串（如 `2026-06-16 10:04:40`），解析为 ISO 格式
+
+### tencent-news
+
+腾讯新闻 JSON POST API，单次请求最多 50 条，支持 5 个频道。
+
+5 个频道：`科技/AI` `要闻` `财经` `体育` `娱乐`
+
+- API 通过 `channel_id` 区分频道，`item_count` 控制返回条数
+- 翻页分页机制在该接口上返回重复数据，因此单次拉取即可满足需求
+- 文章 URL 优先使用 `link_info.url`，回退到 `share_url`
 
 ## 开发
 
@@ -169,11 +180,15 @@ src/
 │       ├── index.ts               # AIbase（JSON API，pageNo 分页）
 │       ├── parser.ts              # JSON → NewsArticle[]
 │       └── constants.ts           # API 配置常量
+│   └── tencent-news/
+│       ├── index.ts               # 腾讯新闻（JSON POST API，5 个频道）
+│       ├── parser.ts              # JSON → NewsArticle[]
+│       └── constants.ts           # channel_id 映射、API 配置
 └── utils/
     ├── index.ts                   # 公共工具：sleep() / titleContains()
     └── logger.ts                  # stderr 日志
 
-test/                              # vitest 测试用例 (193 tests)
+test/                              # vitest 测试用例 (212 tests)
 scripts/build.js                   # esbuild 构建脚本
 ```
 
