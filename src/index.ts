@@ -10,6 +10,7 @@ import { ithomeSource } from './news-source/ithome/index.js';
 import { clsSource } from './news-source/cls/index.js';
 import { aibaseSource } from './news-source/aibase/index.js';
 import { tencentNewsSource } from './news-source/tencent-news/index.js';
+import { kr36Source } from './news-source/36kr/index.js';
 
 // 注册所有新闻源
 registerSource(googleNewsSource);
@@ -22,6 +23,7 @@ registerSource(ithomeSource);
 registerSource(clsSource);
 registerSource(aibaseSource);
 registerSource(tencentNewsSource);
+registerSource(kr36Source);
 
 // 启动 CLI
 const program = createCLI();
