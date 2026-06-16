@@ -12,6 +12,7 @@ import { aibaseSource } from './news-source/aibase/index.js';
 import { tencentNewsSource } from './news-source/tencent-news/index.js';
 import { kr36Source } from './news-source/36kr/index.js';
 import { peopleCnSource } from './news-source/people-cn/index.js';
+import { huxiuSource } from './news-source/huxiu/index.js';
 
 // 注册所有新闻源
 registerSource(googleNewsSource);
@@ -26,6 +27,7 @@ registerSource(aibaseSource);
 registerSource(tencentNewsSource);
 registerSource(kr36Source);
 registerSource(peopleCnSource);
+registerSource(huxiuSource);
 
 // 启动 CLI
 const program = createCLI();
