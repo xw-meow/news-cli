@@ -345,6 +345,7 @@ src/
 
 test/                              # vitest 测试用例 (388 tests, 39 files)
 scripts/build.js                   # esbuild 构建脚本
+site/                              # 介绍站点 (Vite + React + TS + Tailwind, 16 tests)
 ```
 
 ## 扩展新新闻源
