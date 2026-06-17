@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync, rmSync, readFileSync, readdirSync, renameSync } from 'node:fs';
 import { join, basename } from 'node:path';
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 import { NewsCliError } from '../core/types.js';
 import { fetchBinary } from '../core/fetcher.js';
 
@@ -45,7 +45,7 @@ function extractZip(zipPath: string, destDir: string): void {
 
   let listing: string;
   try {
-    listing = execSync(`unzip -Z1 "${zipPath}"`, { encoding: 'utf-8' });
+    listing = execFileSync('unzip', ['-Z1', zipPath], { encoding: 'utf-8' });
   } catch {
     throw new NewsCliError('Failed to read zip file', 'PLUGIN_INSTALL_FAILED');
   }
@@ -66,7 +66,7 @@ function extractZip(zipPath: string, destDir: string): void {
   }
 
   if (stripPrefix) {
-    execSync(`unzip -o "${zipPath}" -d "${destDir}"`, { encoding: 'utf-8' });
+    execFileSync('unzip', ['-o', zipPath, '-d', destDir], { encoding: 'utf-8' });
     const nestedDir = join(destDir, stripPrefix.replace(/\/$/, ''));
     const filesInNested = readdirSync(nestedDir);
     for (const f of filesInNested) {
@@ -74,7 +74,7 @@ function extractZip(zipPath: string, destDir: string): void {
     }
     rmSync(nestedDir, { recursive: true, force: true });
   } else {
-    execSync(`unzip -o "${zipPath}" -d "${destDir}"`, { encoding: 'utf-8' });
+    execFileSync('unzip', ['-o', zipPath, '-d', destDir], { encoding: 'utf-8' });
   }
 }
 
@@ -194,6 +194,7 @@ export async function installFromURL(url: string, opts: InstallOptions): Promise
           name: pluginName,
           version: '0.1.0',
           type: 'module',
+          main: isZip ? undefined : filename,
           'news-plugin': { source: url },
         },
         null,
