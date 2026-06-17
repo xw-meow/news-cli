@@ -3,6 +3,7 @@ import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { HomePage } from './pages/HomePage';
 import { InstallPage } from './pages/InstallPage';
+import { CommandsPage } from './pages/CommandsPage';
 
 export function App() {
   return (
@@ -12,6 +13,7 @@ export function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/install" element={<InstallPage />} />
+          <Route path="/commands" element={<CommandsPage />} />
         </Routes>
       </main>
       <Footer />
