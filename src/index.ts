@@ -1,5 +1,6 @@
 import { registerSource } from './core/registry.js';
 import { createCLI } from './cli.js';
+import { loadPlugins } from './plugin/loader.js';
 import { googleNewsSource } from './news-source/google-news/index.js';
 import { googleNewsCNSource } from './news-source/google-news-cn/index.js';
 import { weiboSource } from './news-source/weibo/index.js';
@@ -35,6 +36,6 @@ registerSource(yicaiSource);
 registerSource(autohomeSource);
 registerSource(bbcSource);
 
-// 启动 CLI
+// 加载动态插件 → 启动 CLI
 const program = createCLI();
-program.parse();
+loadPlugins(program).then(() => program.parse());
