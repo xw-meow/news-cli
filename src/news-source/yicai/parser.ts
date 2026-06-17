@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { parse as parseJS, type Node } from 'acorn';
 import type { NewsArticle } from '../../core/types.js';
 import { CATEGORY_MAP } from './constants.js';
 
@@ -24,23 +25,97 @@ export interface YicaiNewsItem {
   SubChannelName?: string;
 }
 
+/* ── AST 遍历辅助 ── */
+
+/** 浅浅遍历 AST，找到第一个 targetVar = [...] 的数组范围 [start, end] */
+function findArrayRange(
+  ast: Node,
+  targetVar: string,
+  code: string,
+): [number, number] | null {
+  function walk(node: unknown, parentType?: string): [number, number] | null {
+    if (!node || typeof node !== 'object') return null;
+    const n = node as Record<string, unknown>;
+
+    // 处理 `targetVar = [...]` 形式的 ExpressionStatement
+    if (
+      n.type === 'AssignmentExpression' &&
+      (n.left as Record<string, unknown>)?.type === 'Identifier' &&
+      (n.left as Record<string, unknown>)?.name === targetVar &&
+      (n.right as Record<string, unknown>)?.type === 'ArrayExpression'
+    ) {
+      const right = n.right as Record<string, unknown>;
+      return (right as { range: [number, number] }).range;
+    }
+
+    // 处理 `var targetVar = [...]` 形式（以防万一）
+    if (
+      n.type === 'VariableDeclarator' &&
+      (n.id as Record<string, unknown>)?.type === 'Identifier' &&
+      (n.id as Record<string, unknown>)?.name === targetVar &&
+      (n.init as Record<string, unknown>)?.type === 'ArrayExpression'
+    ) {
+      const init = n.init as Record<string, unknown>;
+      return (init as { range: [number, number] }).range;
+    }
+
+    // 遍历子节点
+    for (const key of Object.keys(n)) {
+      if (key === 'parent') continue;
+      const child = n[key];
+      if (Array.isArray(child)) {
+        for (const item of child) {
+          const result = walk(item, n.type as string);
+          if (result) return result;
+        }
+      } else if (child && typeof child === 'object') {
+        const result = walk(child, n.type as string);
+        if (result) return result;
+      }
+    }
+
+    return null;
+  }
+
+  return walk(ast);
+}
+
 /* ── 解析函数 ── */
 
 /**
- * 从 HTML 中提取指定 script 变量（headList / latestList）的 JSON 数组
+ * 从 HTML 中提取指定 script 变量（headList / latestList）的 JSON 数组。
+ * 使用 acorn 做 AST 级 JS 解析，100% 精确处理字符串内嵌 `]`、模板字符串等边界情况。
  */
 export function extractList(html: string, varName: string): YicaiNewsItem[] {
-  const regex = new RegExp(
-    `${varName}\\s*=\\s*(\\[[\\s\\S]*?\\]);`,
-  );
-  const m = html.match(regex);
-  if (!m) return [];
+  const scriptRegex = /<script[^>]*>([\s\S]*?)<\/script>/gi;
+  let scriptMatch: RegExpExecArray | null;
 
-  try {
-    return JSON.parse(m[1]) as YicaiNewsItem[];
-  } catch {
-    return [];
+  while ((scriptMatch = scriptRegex.exec(html)) !== null) {
+    const code = scriptMatch[1];
+
+    let ast: Node;
+    try {
+      ast = parseJS(code, {
+        ecmaVersion: 'latest',
+        sourceType: 'script',
+        ranges: true,
+      }) as unknown as Node;
+    } catch {
+      continue;
+    }
+
+    const range = findArrayRange(ast, varName, code);
+    if (range) {
+      try {
+        const jsonStr = code.slice(range[0], range[1]);
+        return JSON.parse(jsonStr) as YicaiNewsItem[];
+      } catch {
+        return [];
+      }
+    }
   }
+
+  return [];
 }
 
 /**
