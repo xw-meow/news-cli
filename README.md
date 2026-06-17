@@ -57,6 +57,7 @@ news get <source> --json | jq '.[].title'
 | `36kr` | 36氪 — POST API 翻页，17 个频道 | 17 | `最新` |
 | `people-cn` | 人民网 — 每日要闻回顾，HTML 解析 + 日期回溯 | 0 | — |
 | `huxiu` | 虎嗅网 — 商业科技资讯，POST API 翻页，14 个频道 | 14 | `全部` |
+| `yicai` | 第一财经 — 首页 script JSON 解析，头条+最新 | 2 | `最新` |
 
 ### google-news / google-news-cn
 
@@ -152,6 +153,17 @@ AIbase JSON API 抓取，无分类，通过 `pageNo` 递增分页。
 - `pagesize=20` 每页，游标翻页直到凑够 limit 或无更多数据
 - 文章 URL 优先使用 API 返回的 `url` 字段，回退到 `https://www.huxiu.com/article/{aid}.html`
 
+### yicai
+
+第一财经首页 HTML 解析。新闻数据存放在 `<script>` 全局变量中，无需分页。
+
+2 个分类：`头条` `最新`
+
+- `headList` → 头条新闻，`latestList` → 最新新闻
+- 正则提取 `varName = [{...}];` 后 JSON.parse
+- 图片优先取 `originPic`，回退到 `NewsThumbs`
+- 文章 URL 由相对路径拼接 `https://www.yicai.com`
+
 ## 开发
 
 ```bash
@@ -228,11 +240,15 @@ src/
 │       ├── index.ts               # 虎嗅网（JSON POST API，游标翻页）
 │       ├── parser.ts              # JSON → NewsArticle[]
 │       └── constants.ts           # 频道映射、API 配置
+│   └── yicai/
+│       ├── index.ts               # 第一财经（script JSON 解析）
+│       ├── parser.ts              # 正则提取 + JSON → NewsArticle[]
+│       └── constants.ts           # URL、分类变量映射
 └── utils/
     ├── index.ts                   # 公共工具：sleep() / titleContains()
     └── logger.ts                  # stderr 日志
 
-test/                              # vitest 测试用例 (280 tests)
+test/                              # vitest 测试用例 (309 tests)
 scripts/build.js                   # esbuild 构建脚本
 ```
 
