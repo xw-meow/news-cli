@@ -46,7 +46,11 @@ export type ErrorCode =
   | 'FETCH_TIMEOUT'
   | 'FETCH_FAILED'
   | 'PARSE_FAILED'
-  | 'INVALID_OPTION';
+  | 'INVALID_OPTION'
+  | 'PLUGIN_NOT_FOUND'
+  | 'PLUGIN_ALREADY_INSTALLED'
+  | 'PLUGIN_LOAD_FAILED'
+  | 'PLUGIN_INSTALL_FAILED';
 
 /** 统一错误类型 */
 export class NewsCliError extends Error {
