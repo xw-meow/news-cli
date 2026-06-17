@@ -38,4 +38,9 @@ registerSource(bbcSource);
 
 // 加载动态插件 → 启动 CLI
 const program = createCLI();
-loadPlugins(program).then(() => program.parse());
+loadPlugins(program)
+  .then(() => program.parse())
+  .catch((err: unknown) => {
+    process.stderr.write(`[ERROR] Plugin loader failed: ${err instanceof Error ? err.message : String(err)}\n`);
+    program.parse(); // still parse even if loader fails
+  });

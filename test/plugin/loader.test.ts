@@ -86,17 +86,17 @@ describe('loader - loadPlugins', () => {
   it('local plugin overrides global plugin with same name', async () => {
     clearSources();
 
-    const GLOBAL_DIR = resolve(process.env.HOME ?? tmpdir(), '.news-plugins-loader-test');
+    const originalHome = process.env.HOME;
+    const testHome = resolve(tmpdir(), 'news-cli-plugin-test-loader-home');
+    const GLOBAL_DIR = resolve(testHome, '.news-plugins');
 
     try {
+      process.env.HOME = testHome;
+
       // global plugin registers source "global-source"
       createPlugin(GLOBAL_DIR, 'same-name', 'global-source');
       // local plugin registers source "local-source"
       createPlugin(LOCAL_DIR, 'same-name', 'local-source');
-
-      // Monkey-patch: override HOME to point to our test global dir
-      const originalHome = process.env.HOME;
-      process.env.HOME = resolve(tmpdir(), 'news-cli-plugin-test-loader');
 
       const originalCwd = process.cwd();
       process.chdir(TEST_BASE);
@@ -110,9 +110,9 @@ describe('loader - loadPlugins', () => {
         expect(sources.some((s) => s.name === 'global-source')).toBe(false);
       } finally {
         process.chdir(originalCwd);
-        process.env.HOME = originalHome;
       }
     } finally {
+      process.env.HOME = originalHome;
       try { rmSync(GLOBAL_DIR, { recursive: true, force: true }); } catch {}
     }
   });

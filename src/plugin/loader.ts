@@ -1,5 +1,6 @@
 import { readdirSync, existsSync, readFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
+import { homedir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 import type { Command } from 'commander';
 import type { Plugin, PluginRegistry } from './types.js';
@@ -13,7 +14,7 @@ function getLocalDir(): string {
 }
 
 function getGlobalDir(): string {
-  return resolve(process.env.HOME ?? '~', PLUGIN_DIR_NAME);
+  return resolve(process.env.HOME ?? homedir(), PLUGIN_DIR_NAME);
 }
 
 /**
