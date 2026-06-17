@@ -80,7 +80,7 @@ export const sources: SourceData[] = [
   },
   {
     name: 'huxiu',
-    description: '虎嗅网 — 商业科技资讯，14 个频道游标翻页',
+    description: '虎嗅网 — 商业科技资讯，15 个频道游标翻页',
     type: 'JSON',
     categories: ['全部', '前沿科技', '车与出行', '商业消费', '金融财经', '社会文化', '游戏娱乐', '出海', '国际热点', '健康', '书影音', '医疗', '3C数码', '观点', '其他'],
   },
