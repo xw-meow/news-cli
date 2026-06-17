@@ -29,6 +29,17 @@ describe('CLI E2E', () => {
     const { stdout, status } = run('list');
     expect(status).toBe(0);
     expect(stdout).toContain('google-news');
+    expect(stdout).toContain('个新闻源');
+  });
+
+  it('should list sources as JSON', () => {
+    const { stdout, status } = run('list --json');
+    expect(status).toBe(0);
+    const parsed = JSON.parse(stdout);
+    expect(Array.isArray(parsed)).toBe(true);
+    expect(parsed.length).toBeGreaterThan(0);
+    expect(parsed[0]).toHaveProperty('name');
+    expect(parsed[0]).toHaveProperty('description');
   });
 
   it('should list categories for google-news', () => {

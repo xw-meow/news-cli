@@ -16,21 +16,38 @@ export function createCLI(): Command {
   program
     .command('list')
     .description('List all available news sources')
-    .action(() => {
+    .option('--json', 'Output as JSON')
+    .action((opts: { json?: boolean }) => {
       const sources = listSources();
+
+      if (opts.json) {
+        const data = sources.map((s) => ({ name: s.name, description: s.description }));
+        process.stdout.write(JSON.stringify(data, null, 2) + '\n');
+        return;
+      }
+
       if (sources.length === 0) {
         process.stdout.write('(no sources available)\n');
         return;
       }
 
+      const B = '\x1b[1m';
+      const G = '\x1b[90m';
+      const C = '\x1b[36m';
+      const R = '\x1b[0m';
+      const D = `${G}—${R}`;
+
       const nameWidth = Math.max(...sources.map((s) => s.name.length));
-      const prefixWidth = nameWidth + 4; // 2-char indent + 2-char gap
+      const prefixWidth = nameWidth + 4;
 
       for (const s of sources) {
-        const nameCol = `  ${s.name}`;
-        const padding = prefixWidth - nameCol.length;
-        process.stdout.write(`${nameCol}${' '.repeat(Math.max(padding, 2))}${s.description}\n`);
+        const nameCol = `  ${B}${C}${s.name}${R}`;
+        const padding = prefixWidth - s.name.length - 2;
+        process.stdout.write(`${nameCol}${' '.repeat(Math.max(padding, 2))}${D} ${s.description}\n`);
       }
+
+      process.stdout.write(`\n${G}---${R}\n`);
+      process.stdout.write(`${G}当前已收录 ${B}${sources.length}${R}${G} 个新闻源${R}\n`);
     });
 
   // news categories <source> — 列出某个源的分类
