@@ -4,6 +4,7 @@ import { Footer } from './components/layout/Footer';
 import { HomePage } from './pages/HomePage';
 import { InstallPage } from './pages/InstallPage';
 import { CommandsPage } from './pages/CommandsPage';
+import { SourcesPage } from './pages/SourcesPage';
 
 export function App() {
   return (
@@ -14,6 +15,7 @@ export function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/install" element={<InstallPage />} />
           <Route path="/commands" element={<CommandsPage />} />
+          <Route path="/sources" element={<SourcesPage />} />
         </Routes>
       </main>
       <Footer />
