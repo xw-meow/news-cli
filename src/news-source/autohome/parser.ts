@@ -68,7 +68,7 @@ const ARTICLE_URL_RE = /\/\/www\.autohome\.com\.cn\/[^"]*\.html/i;
 export function parseArticles(html: string, category?: string): NewsArticle[] {
   const articles: NewsArticle[] = [];
 
-  const liRegex = /<li\b[^>]*>([\s\S]*?)<\/li>/gi;
+  const liRegex = /(<li\b[^>]*>[\s\S]*?)<\/li>/gi;
   let liMatch: RegExpExecArray | null;
 
   while ((liMatch = liRegex.exec(html)) !== null) {
@@ -108,11 +108,19 @@ export function parseArticles(html: string, category?: string): NewsArticle[] {
       imageUrl = src.startsWith('//') ? 'https:' + src : src;
     }
 
-    // 相对时间
+    // 相对时间（优先）；焦点文章用 data-operation-extend 中的绝对时间 dt 回退
     let publishedAt: string | undefined;
     const timeMatch = block.match(/(\d+)\s*(?:分钟|小时|天)前/);
     if (timeMatch) {
       publishedAt = parseRelativeTime(timeMatch[0]);
+    } else {
+      const dtMatch = block.match(/"dt":"([^"]+)"/);
+      if (dtMatch) {
+        const d = new Date(dtMatch[1] + '+08:00');
+        if (!isNaN(d.getTime())) {
+          publishedAt = d.toISOString();
+        }
+      }
     }
 
     // 摘要：从 <p> 文本中取，去掉 [来源] 前缀，跳过与标题相同的
