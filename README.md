@@ -58,6 +58,7 @@ news get <source> --json | jq '.[].title'
 | `people-cn` | 人民网 — 每日要闻回顾，HTML 解析 + 日期回溯 | 0 | — |
 | `huxiu` | 虎嗅网 — 商业科技资讯，POST API 翻页，14 个频道 | 14 | `全部` |
 | `yicai` | 第一财经 — 首页 script JSON 解析，头条+最新 | 2 | `最新` |
+| `autohome` | 汽车之家 — HTML 解析 + 逐页分页，11 个分类 | 11 | `最新` |
 
 ### google-news / google-news-cn
 
@@ -164,6 +165,19 @@ AIbase JSON API 抓取，无分类，通过 `pageNo` 递增分页。
 - 图片优先取 `originPic`，回退到 `NewsThumbs`
 - 文章 URL 由相对路径拼接 `https://www.yicai.com`
 
+### autohome
+
+汽车之家 HTML 直接解析，无需 RSS/API。进入各分类页面逐页抓取文章列表，翻页至凑够 limit 或空页为止。
+
+11 个分类：
+
+`最新` `车闻` `导购` `试驾评测` `用车` `文化` `游记` `技术` `改装赛事` `新能源` `行业`
+
+- 页面使用 GB2312 编码，fetcher 自动检测 `<meta charset>` 并用 `TextDecoder` 正确解码
+- 焦点文章用 `<h2>` 标题，普通文章用 `<h3>`，快讯用 `<p>` 回退
+- 时间提取优先相对时间（X分钟前/小时前/天前），焦点文章回退到 `data-operation-extend` 中的绝对时间 `dt` 字段
+- 来源标签（`[汽车之家 XXX]`）自动从摘要中剥离
+
 ## 开发
 
 ```bash
@@ -244,11 +258,15 @@ src/
 │       ├── index.ts               # 第一财经（script JSON 解析）
 │       ├── parser.ts              # 正则提取 + JSON → NewsArticle[]
 │       └── constants.ts           # URL、分类变量映射
+│   └── autohome/
+│       ├── index.ts               # 汽车之家（HTML 解析 + 逐页分页，11 个分类）
+│       ├── parser.ts              # HTML regex → NewsArticle[]
+│       └── constants.ts           # 分类-路径映射、分页配置
 └── utils/
     ├── index.ts                   # 公共工具：sleep() / titleContains()
     └── logger.ts                  # stderr 日志
 
-test/                              # vitest 测试用例 (309 tests)
+test/                              # vitest 测试用例 (348 tests)
 scripts/build.js                   # esbuild 构建脚本
 ```
 
