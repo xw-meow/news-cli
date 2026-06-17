@@ -14,6 +14,7 @@ import { kr36Source } from './news-source/36kr/index.js';
 import { peopleCnSource } from './news-source/people-cn/index.js';
 import { huxiuSource } from './news-source/huxiu/index.js';
 import { yicaiSource } from './news-source/yicai/index.js';
+import { autohomeSource } from './news-source/autohome/index.js';
 
 // 注册所有新闻源
 registerSource(googleNewsSource);
@@ -30,6 +31,7 @@ registerSource(kr36Source);
 registerSource(peopleCnSource);
 registerSource(huxiuSource);
 registerSource(yicaiSource);
+registerSource(autohomeSource);
 
 // 启动 CLI
 const program = createCLI();

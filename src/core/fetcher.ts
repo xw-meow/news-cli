@@ -33,7 +33,27 @@ async function fetchText(url: string, timeoutMs: number, extraHeaders?: Record<s
         );
       }
 
-      return await response.text();
+      // 读取原始字节，自动检测编码（适配 GB2312 等非 UTF-8 页面）
+      const buffer = await response.arrayBuffer();
+      const contentType = response.headers.get('content-type') || '';
+      const headerCharset = contentType.match(/charset=([^\s;]+)/i)?.[1];
+
+      if (headerCharset && headerCharset.toLowerCase() !== 'utf-8') {
+        return new TextDecoder(headerCharset).decode(buffer);
+      }
+
+      // 先用 UTF-8 解码，检查 <meta charset> 是否指定了其他编码
+      const utf8Text = new TextDecoder('utf-8').decode(buffer);
+      const metaCharset = utf8Text.slice(0, 2048).match(/<meta[^>]*charset=["']?([^"'\s>]+)/i)?.[1];
+      if (metaCharset && metaCharset.toLowerCase() !== 'utf-8') {
+        try {
+          return new TextDecoder(metaCharset).decode(buffer);
+        } catch {
+          // 不支持的编码，回退 UTF-8
+        }
+      }
+
+      return utf8Text;
     } catch (err: unknown) {
       // AbortError = timeout
       if (err instanceof DOMException && err.name === 'AbortError') {
@@ -71,10 +91,8 @@ export async function fetchRSS(url: string, timeoutMs: number, extraHeaders?: Re
 }
 
 /**
- * 通用 HTML 页面抓取：超时控制 + 重试 + UA 伪装
- * @param url - 页面地址
- * @param timeoutMs - 超时毫秒数
- * @returns HTML 字符串
+ * 通用 HTML 页面抓取：超时控制 + 重试 + UA 伪装。
+ * 自动检测编码（meta charset），适配 GB2312 等非 UTF-8 页面。
  */
 export async function fetchHTML(url: string, timeoutMs: number, extraHeaders?: Record<string, string>): Promise<string> {
   return fetchText(url, timeoutMs, extraHeaders);
