@@ -40,6 +40,59 @@ news get <source> --json
 news get <source> --json | jq '.[].title'
 ```
 
+## Plugins
+
+Plugins extend news-cli with new sources and commands, loaded dynamically at startup.
+
+### Plugin locations
+
+- `<cwd>/.news-plugins/<name>/` — local (project-specific)
+- `~/.news-plugins/<name>/` — global
+
+Local plugins override global plugins with the same name.
+
+### Commands
+
+```bash
+news plugin install <url>              # Install from URL (.js or .zip)
+news plugin install <npm-package>      # Install from npm
+news plugin install <target> -g        # Install globally
+news plugin install <target> --force   # Overwrite existing
+
+news plugin list                       # List installed plugins
+news plugin list --json
+
+news plugin uninstall <name>           # Remove plugin
+news plugin uninstall <name> -g
+
+news plugin update <name>              # Update plugin
+news plugin update <name> -g
+```
+
+### Writing a plugin
+
+A plugin is a directory with `package.json` and an entry file exporting a `plugin` object:
+
+```js
+// index.js
+export const plugin = {
+  name: 'my-plugin',
+  version: '1.0.0',
+  register(program, registry) {
+    // Register a new news source
+    registry.registerSource({
+      name: 'my-source',
+      description: 'My custom news source',
+      async listCategories() { return ['tech', 'sports']; },
+      async fetch(options) { return [/* NewsArticle[] */]; },
+    });
+
+    // Register a new CLI command
+    program.command('hello').action(() => console.log('Hello from plugin!'));
+  },
+};
+```
+
 ## 已录入新闻源
 
 | 源名 | 说明 | 分类数 | 默认分类 |
@@ -213,8 +266,14 @@ src/
 ├── core/
 │   ├── types.ts                   # NewsArticle, NewsSource, NewsCliError
 │   ├── registry.ts                # source 注册表
-│   ├── fetcher.ts                 # HTTP 抓取（超时/重试 + JSON POST）
+│   ├── fetcher.ts                 # HTTP 抓取（超时/重试 + JSON POST / 二进制）
 │   └── formatter.ts               # 终端表格 + JSON 输出
+├── plugin/
+│   ├── types.ts                   # Plugin, PluginRegistry, PluginMeta
+│   ├── loader.ts                  # 动态加载（局部 → 全局，局部优先）
+│   ├── installer.ts               # install（URL 下载 / npm 安装）
+│   ├── manager.ts                 # list / uninstall / update
+│   └── cli.ts                     # plugin 子命令注册
 ├── news-source/
 │   ├── google-news/
 │   │   ├── index.ts               # 全球版（英文）
@@ -284,7 +343,7 @@ src/
     ├── index.ts                   # 公共工具：sleep() / titleContains()
     └── logger.ts                  # stderr 日志
 
-test/                              # vitest 测试用例 (368 tests, 34 files)
+test/                              # vitest 测试用例 (388 tests, 39 files)
 scripts/build.js                   # esbuild 构建脚本
 ```
 
