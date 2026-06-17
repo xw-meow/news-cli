@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev          # tsx hot-run src/index.ts
 npm run build        # esbuild → dist/index.js (single ESM bundle, shebang, deps external)
-npm test             # vitest run (234 tests, 24 files)
+npm test             # vitest run (310 tests, 30 files)
 npm run test:watch   # vitest watch mode
 npm run lint         # ESLint (flat config, TS + recommended rules)
 npm run lint:fix     # ESLint auto-fix
@@ -46,7 +46,7 @@ All fetch functions share the same retry/timeout logic: up to 3 retries with 1s 
 
 - **`fetchRSS(url, timeoutMs, extraHeaders?)`** — GET, returns raw text. Used by RSS-based sources (google-news, chinanews).
 - **`fetchHTML(url, timeoutMs, extraHeaders?)`** — GET, returns raw text. Used by HTML-scraping sources (ithome).
-- **`fetchJSON<T>(url, timeoutMs, extraHeaders?, method?, body?)`** — generic JSON fetch with optional POST method and JSON body. Used by API-based sources: GET (weibo, cls, pengpai, aibase), POST (tencent-news, 36kr).
+- **`fetchJSON<T>(url, timeoutMs, extraHeaders?, method?, body?)`** — generic JSON fetch with optional POST method and JSON body. Used by API-based sources: GET (weibo, cls, pengpai, aibase), POST (tencent-news, 36kr, huxiu).
 - **`fetchText(url, timeoutMs, extraHeaders?)`** — internal, not exported. All three public functions delegate to it.
 
 Errors are thrown as `NewsCliError` with `FETCH_TIMEOUT` or `FETCH_FAILED` codes.
@@ -59,8 +59,9 @@ Sources follow one of these patterns. When adding a new source, pick the closest
 |---------|---------|-------|-------|
 | **RSS** | google-news, google-news-cn, chinanews | `fetchRSS()` | `fast-xml-parser` → `NewsArticle[]` |
 | **JSON GET** | weibo, cls, pengpai, aibase | `fetchJSON<T>()` | typed JSON → `NewsArticle[]` |
-| **JSON POST** | tencent-news, 36kr | `fetchJSON<T>(url, ms, headers, 'POST', body)` | typed JSON → `NewsArticle[]` |
-| **HTML scrape** | ithome | `fetchHTML()` | regex extraction |
+| **JSON POST** | tencent-news, 36kr, huxiu | `fetchJSON<T>(url, ms, headers, 'POST', body)` | typed JSON → `NewsArticle[]` |
+| **HTML regex** | ithome, people-cn | `fetchHTML()` | regex extraction → `NewsArticle[]` |
+| **HTML + Script JSON** | yicai | `fetchHTML()` | acorn AST → JSON.parse → `NewsArticle[]` |
 | **Multi-step API** | sspai | `fetchJSON<T>()` × N | fetch list → fetch each article detail |
 
 **Pagination strategies vary by source:**
@@ -71,6 +72,9 @@ Sources follow one of these patterns. When adding a new source, pick the closest
 - aibase: simple `pageNo` increment
 - ithome: AJAX pagination via additional HTML requests
 - tencent-news: single POST with `item_count` (pagination returns duplicates, so single request only)
+- people-cn: date-backtracking loop (today → up to 7 days back, stops when count ≥ limit)
+- huxiu: `last_id` cursor from `pcArticleList` response, de-duplicates by `aid`
+- yicai: no pagination (all data in one homepage `<script>` block)
 
 ### Utils (`src/utils/`)
 
@@ -82,9 +86,17 @@ Sources follow one of these patterns. When adding a new source, pick the closest
 
 Each source has its own `parser.ts` that converts its raw format to `NewsArticle[]`. All parsers generate IDs via SHA-256 hash of the article URL (first 12 hex chars). The Google News parser (`google-news/parser.ts`) is the most complex — it splits "Title - Source Name" format and strips HTML from descriptions. It's reused directly by `google-news-cn` via import (same RSS structure, different locale params).
 
+For sources that embed JSON in `<script>` tags (like yicai), use **acorn** to parse the JavaScript AST, then locate the `ArrayExpression` node by `range` and slice the original source for `JSON.parse`. This avoids regex bracket-matching bugs when JSON string values contain `]`.
+
+### CLI features
+
+- `news list` — colored output: bold cyan source names, gray `—` separators, footer with source count
+- `news list --json` — outputs `[{name, description}, ...]` for programmatic consumption
+- `news get <source> --json` — pipe-safe JSON output (stdout), errors go to stderr
+
 ### Build
 
-esbuild bundles to a single ESM file targeting Node 18. `packages: 'external'` — runtime deps (`commander`, `cli-table3`, `fast-xml-parser`) must be installed. A `#!/usr/bin/env node` banner is prepended.
+esbuild bundles to a single ESM file targeting Node 18. `packages: 'external'` — runtime deps (`acorn`, `cli-table3`, `commander`, `fast-xml-parser`) are not bundled and must be installed. A `#!/usr/bin/env node` banner is prepended. Output is ~66KB.
 
 ### Testing
 
