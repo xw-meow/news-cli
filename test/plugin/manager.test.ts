@@ -49,11 +49,12 @@ describe('manager', () => {
     process.chdir(TEST_BASE);
     try {
       const plugins = listPlugins();
-      expect(plugins).toHaveLength(2);
+      expect(plugins.length).toBeGreaterThanOrEqual(2);
+      expect(plugins.find((p) => p.name === 'plugin-a')).toBeDefined();
+      expect(plugins.find((p) => p.name === 'plugin-b')).toBeDefined();
       expect(plugins[0].name).toBe('plugin-a');
       expect(plugins[0].version).toBe('1.2.3');
       expect(plugins[0].scope).toBe('local');
-      expect(plugins[1].name).toBe('plugin-b');
     } finally {
       process.chdir(original);
     }

@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+import { resolve, join, dirname } from 'node:path';
+import { homedir } from 'node:os';
 import { execSync } from 'node:child_process';
 import { NewsCliError } from '../core/types.js';
 import type { PluginMeta } from './types.js';
@@ -11,7 +12,7 @@ function getLocalDir(): string {
 }
 
 function getGlobalDir(): string {
-  return resolve(process.env.HOME ?? '~', PLUGIN_DIR_NAME);
+  return resolve(process.env.HOME ?? homedir(), PLUGIN_DIR_NAME);
 }
 
 /**
@@ -111,7 +112,7 @@ export async function updatePlugin(name: string, global: boolean): Promise<void>
     rmSync(pluginDir, { recursive: true, force: true });
     const { installFromURL } = await import('./installer.js');
     await installFromURL(sourceUrl, {
-      basePath: global ? (process.env.HOME ?? '~') : process.cwd(),
+      basePath: global ? dirname(getGlobalDir()) : process.cwd(),
       force: true,
     });
     return;
