@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 开发工作流
+
+**每个新需求必须走独立分支，用户验证通过后才能合并：**
+
+1. `git checkout -b feat/<name>` — 从 main 新建特性分支
+2. 在分支上开发 + typecheck + 测试全部通过
+3. `npm run build && npm link` — 构建并链接
+4. 列出测试命令给用户，**等待用户确认没问题**
+5. 用户通过后才 `git checkout main && git merge feat/<name>`
+6. 更新 README（源表格、说明、项目结构、测试数）
+7. `git push` 推送
+
 ## Commands
 
 ```bash
