@@ -167,3 +167,49 @@ export async function fetchJSON<T>(
 
   throw new NewsCliError(`Unexpected: fetchJSON exhausted retries for ${url}`, 'FETCH_FAILED');
 }
+
+/**
+ * 通用二进制文件下载：超时控制 + 重试 + UA 伪装
+ * @param url - 下载地址
+ * @param timeoutMs - 超时毫秒数
+ * @returns 文件二进制数据
+ */
+export async function fetchBinary(url: string, timeoutMs: number): Promise<Buffer> {
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+      const response = await fetch(url, {
+        headers: { 'User-Agent': USER_AGENT },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timer);
+
+      if (!response.ok) {
+        throw new NewsCliError(
+          `HTTP ${response.status} when fetching ${url}`,
+          'FETCH_FAILED',
+        );
+      }
+
+      return Buffer.from(await response.arrayBuffer());
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw new NewsCliError(`Request timeout: ${url}`, 'FETCH_TIMEOUT');
+      }
+      if (err instanceof NewsCliError) {
+        throw err;
+      }
+      if (attempt === MAX_RETRIES) {
+        throw new NewsCliError(
+          `Failed to fetch ${url} after ${MAX_RETRIES} attempts: ${String(err)}`,
+          'FETCH_FAILED',
+        );
+      }
+      await sleep(RETRY_DELAY_MS);
+    }
+  }
+  throw new NewsCliError(`Unexpected: fetchBinary exhausted retries for ${url}`, 'FETCH_FAILED');
+}

@@ -1,7 +1,13 @@
-import { existsSync, mkdirSync, writeFileSync, rmSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync, rmSync, readFileSync, readdirSync, renameSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { execSync } from 'node:child_process';
 import { NewsCliError } from '../core/types.js';
+import { fetchBinary } from '../core/fetcher.js';
+
+/** Validate npm package name to prevent command injection */
+function isValidPackageName(name: string): boolean {
+  return /^@?[a-zA-Z0-9][a-zA-Z0-9._-]*(\/[a-zA-Z0-9][a-zA-Z0-9._-]*)?$/.test(name);
+}
 
 export interface InstallOptions {
   /** 安装目标目录的基路径：局部 = process.cwd()，全局 = ~ */
@@ -32,30 +38,6 @@ function pluginNameFromFile(filename: string): string {
   return filename.slice(0, dot);
 }
 
-/** 下载文件到磁盘，返回写入的文件路径 */
-async function downloadFile(url: string, destPath: string, timeoutMs: number): Promise<void> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-      },
-      signal: controller.signal,
-    });
-  } finally {
-    clearTimeout(timer);
-  }
-
-  if (!response.ok) {
-    throw new NewsCliError(`HTTP ${response.status} when downloading ${url}`, 'PLUGIN_INSTALL_FAILED');
-  }
-
-  const buffer = Buffer.from(await response.arrayBuffer());
-  writeFileSync(destPath, buffer);
-}
 
 /** 解压 zip 到目标目录，处理 GitHub 嵌套目录 */
 function extractZip(zipPath: string, destDir: string): void {
@@ -86,12 +68,9 @@ function extractZip(zipPath: string, destDir: string): void {
   if (stripPrefix) {
     execSync(`unzip -o "${zipPath}" -d "${destDir}"`, { encoding: 'utf-8' });
     const nestedDir = join(destDir, stripPrefix.replace(/\/$/, ''));
-    const filesInNested = execSync(`ls -1 "${nestedDir}"`, { encoding: 'utf-8' }).trim().split('\n');
+    const filesInNested = readdirSync(nestedDir);
     for (const f of filesInNested) {
-      if (!f) continue;
-      const src = join(nestedDir, f);
-      const dst = join(destDir, f);
-      execSync(`mv "${src}" "${dst}"`);
+      renameSync(join(nestedDir, f), join(destDir, f));
     }
     rmSync(nestedDir, { recursive: true, force: true });
   } else {
@@ -179,22 +158,18 @@ export async function installFromURL(url: string, opts: InstallOptions): Promise
   const isZip = filename.endsWith('.zip');
   const downloadPath = join(pluginDir, isZip ? 'plugin.zip' : filename);
 
-  // 下载（带重试）
-  const MAX_RETRIES = 3;
-  let lastErr: unknown;
-  for (let i = 0; i < MAX_RETRIES; i++) {
-    try {
-      await downloadFile(url, downloadPath, 30000);
-      lastErr = null;
-      break;
-    } catch (err) {
-      lastErr = err;
-      if (i < MAX_RETRIES - 1) {
-        await new Promise((r) => setTimeout(r, 1000));
-      }
+  // 下载（使用共享 fetcher 基础设施：重试 + 超时 + UA）
+  let buffer: Buffer;
+  try {
+    buffer = await fetchBinary(url, 30000);
+  } catch (err) {
+    // 下载失败时清理
+    if (existsSync(pluginDir)) {
+      rmSync(pluginDir, { recursive: true, force: true });
     }
+    throw err;
   }
-  if (lastErr) throw lastErr;
+  writeFileSync(downloadPath, buffer);
 
   if (isZip) {
     extractZip(downloadPath, pluginDir);
@@ -239,6 +214,13 @@ export async function installFromURL(url: string, opts: InstallOptions): Promise
 }
 
 export async function installFromNpm(packageName: string, opts: InstallOptions): Promise<string> {
+  if (!isValidPackageName(packageName)) {
+    throw new NewsCliError(
+      `Invalid npm package name: "${packageName}"`,
+      'INVALID_OPTION',
+    );
+  }
+
   const pluginName = packageName.replace(/^@/, '').replace(/\//, '-');
   const pluginDir = join(opts.basePath, '.news-plugins', pluginName);
 
