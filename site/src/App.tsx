@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { HomePage } from './pages/HomePage';
+import { InstallPage } from './pages/InstallPage';
 
 export function App() {
   return (
@@ -10,6 +11,7 @@ export function App() {
       <main className="pt-14 flex-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/install" element={<InstallPage />} />
         </Routes>
       </main>
       <Footer />
