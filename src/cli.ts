@@ -3,6 +3,7 @@ import { getSource, listSources } from './core/registry.js';
 import { formatOutput } from './core/formatter.js';
 import { NewsCliError } from './core/types.js';
 import { error as logError } from './utils/logger.js';
+import { registerPluginCommands } from './plugin/cli.js';
 
 export function createCLI(): Command {
   const program = new Command();
@@ -115,6 +116,9 @@ export function createCLI(): Command {
         handleError(err);
       }
     });
+
+  // news plugin — 插件管理
+  registerPluginCommands(program);
 
   return program;
 }
