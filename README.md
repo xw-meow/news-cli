@@ -59,6 +59,7 @@ news get <source> --json | jq '.[].title'
 | `huxiu` | 虎嗅网 — 商业科技资讯，POST API 翻页，14 个频道 | 14 | `全部` |
 | `yicai` | 第一财经 — 首页 script JSON 解析，头条+最新 | 2 | `最新` |
 | `autohome` | 汽车之家 — HTML 解析 + 逐页分页，11 个分类 | 11 | `最新` |
+| `bbc` | BBC News — Content Collection API 翻页，7 个分类 | 7 | `technology` |
 
 ### google-news / google-news-cn
 
@@ -178,6 +179,19 @@ AIbase JSON API 抓取，无分类，通过 `pageNo` 递增分页。
 - 时间提取优先相对时间（X分钟前/小时前/天前），焦点文章回退到 `data-operation-extend` 中的绝对时间 `dt` 字段
 - 来源标签（`[汽车之家 XXX]`）自动从摘要中剥离
 
+### bbc
+
+BBC News JSON API 抓取，通过 Content Collection API 分页翻页。
+
+7 个分类：`technology` `business` `business-more` `health` `culture` `arts` `travel`
+
+- 每个分类对应不同的 `collectionId` 和 `path`，通过 URL 参数 `country=hk&page=N&size=N` 控制分页
+- 默认无分类时使用 `technology`
+- 关键词搜索时聚合所有分类拉取，再通过 `titleContains` 本地标题过滤
+- 文章 URL 由 `path` 字段拼接 `https://www.bbc.com`
+- `publishedAt` 使用 `firstPublishedAt` 字段，`category` 取 `topics[0]`
+- 非 `article` 类型（video 等）自动过滤
+
 ## 开发
 
 ```bash
@@ -262,11 +276,15 @@ src/
 │       ├── index.ts               # 汽车之家（HTML 解析 + 逐页分页，11 个分类）
 │       ├── parser.ts              # HTML regex → NewsArticle[]
 │       └── constants.ts           # 分类-路径映射、分页配置
+│   └── bbc/
+│       ├── index.ts               # BBC News（JSON API 翻页，7 个分类）
+│       ├── parser.ts              # JSON → NewsArticle[]
+│       └── constants.ts           # 分类-collectionId 映射、API 配置
 └── utils/
     ├── index.ts                   # 公共工具：sleep() / titleContains()
     └── logger.ts                  # stderr 日志
 
-test/                              # vitest 测试用例 (348 tests)
+test/                              # vitest 测试用例 (368 tests, 34 files)
 scripts/build.js                   # esbuild 构建脚本
 ```
 
