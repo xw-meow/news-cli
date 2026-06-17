@@ -1,3 +1,4 @@
+import { homedir } from 'node:os';
 import type { Command } from 'commander';
 import { installPlugin } from './installer.js';
 import { listPlugins, uninstallPlugin, updatePlugin } from './manager.js';
@@ -18,7 +19,7 @@ export function registerPluginCommands(program: Command): void {
     .action(async (target: string, opts: { global?: boolean; force?: boolean }) => {
       try {
         const basePath = opts.global
-          ? (process.env.HOME ?? '~')
+          ? (process.env.HOME ?? homedir())
           : process.cwd();
         const name = await installPlugin(target, {
           basePath,
