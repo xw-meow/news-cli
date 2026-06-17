@@ -8,7 +8,7 @@ interface TerminalBlockProps {
 
 export function TerminalBlock({ lines, showPrompt = true, showDots = true }: TerminalBlockProps) {
   return (
-    <div className="bg-black border border-gray-800 rounded-lg p-5 font-mono text-sm leading-relaxed">
+    <div className="bg-black border border-gray-800 rounded-lg p-5 font-mono text-sm leading-relaxed text-left">
       {showDots && (
         <div className="flex gap-1.5 mb-3">
           <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
