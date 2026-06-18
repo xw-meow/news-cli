@@ -15,29 +15,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
-      - name: Install & Verify
+      - name: Install & Build
         working-directory: ./site
         run: |
           npm ci
-          # Verify key packages are actually installed
-          echo "=== Checking node_modules ==="
-          ls node_modules/react-router-dom/dist/index.js && echo "✓ react-router-dom" || echo "✗ react-router-dom MISSING"
-          ls node_modules/react/index.js && echo "✓ react" || echo "✗ react MISSING"
-          ls node_modules/@types/react/index.d.ts && echo "✓ @types/react" || echo "✗ @types/react MISSING"
-
-      - name: Build
-        working-directory: ./site
-        run: |
-          echo "=== pwd ===" && pwd
-          echo "=== tsconfig ===" && cat tsconfig.json
-          echo "=== node ===" && node -v && npm -v
-          echo "=== npm ls react-router-dom ===" && npm ls react-router-dom 2>&1 || true
-          echo "=== tsc --showConfig ===" && npx tsc --showConfig 2>&1 || true
-          echo "=== tsc --traceResolution ===" && npx tsc --traceResolution 2>&1 | head -40 || true
-          echo "=== tsc (actual build) ==="
-          npx tsc && npx vite build
+          npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
