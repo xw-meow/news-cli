@@ -16,14 +16,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: './site/package-lock.json'  # 指定锁文件路径
 
-      - name: Install & Build
+      - name: Install & Verify
+        working-directory: ./site
         run: |
-          cd ./site
           npm ci
-          npm run build
+          # Verify key packages are actually installed
+          echo "=== Checking node_modules ==="
+          ls node_modules/react-router-dom/dist/index.js && echo "✓ react-router-dom" || echo "✗ react-router-dom MISSING"
+          ls node_modules/react/index.js && echo "✓ react" || echo "✗ react MISSING"
+          ls node_modules/@types/react/index.d.ts && echo "✓ @types/react" || echo "✗ @types/react MISSING"
+
+      - name: Build
+        working-directory: ./site
+        run: npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
