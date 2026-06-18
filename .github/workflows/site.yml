@@ -29,7 +29,15 @@ jobs:
 
       - name: Build
         working-directory: ./site
-        run: npm run build
+        run: |
+          echo "=== pwd ===" && pwd
+          echo "=== tsconfig ===" && cat tsconfig.json
+          echo "=== node ===" && node -v && npm -v
+          echo "=== npm ls react-router-dom ===" && npm ls react-router-dom 2>&1 || true
+          echo "=== tsc --showConfig ===" && npx tsc --showConfig 2>&1 || true
+          echo "=== tsc --traceResolution ===" && npx tsc --traceResolution 2>&1 | head -40 || true
+          echo "=== tsc (actual build) ==="
+          npx tsc && npx vite build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
