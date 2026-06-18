@@ -15,10 +15,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-
-      - name: Install specific npm version
-        run: npm install -g npm@10.9.2
+          node-version: '24'
 
       - name: Install & Build
         working-directory: ./site
