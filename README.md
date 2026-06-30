@@ -17,12 +17,11 @@
 
 <p>
   <a href="https://xw-meow.github.io/news-cli/">🌐 项目官网</a> ·
-  <a href="#-用户指南">用户指南</a> ·
-  <a href="#-开发者指南">开发者指南</a>
+  <a href="#一-用户指南">用户指南</a> ·
+  <a href="#二-开发者指南">开发者指南</a>
 </p>
 
 <p>
-  <img src="https://img.shields.io/github/actions/workflow/status/xw-meow/news-cli/site.yml?branch=main&style=flat-square&label=site" alt="Site Workflow">
   <img src="https://img.shields.io/badge/node-%3E%3D18-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js >= 18">
   <img src="https://img.shields.io/badge/license-MIT-9cf?style=flat-square" alt="License MIT">
 </p>
@@ -31,11 +30,11 @@
 
 ---
 
-## 👤 用户指南
+## 一、用户指南
 
 如果你是来用工具的，看这里。
 
-### 安装
+### 1.1 安装
 
 ```bash
 npm install -g news-cli
@@ -53,7 +52,7 @@ npm link
 
 需要 Node.js ≥ 18。
 
-### 快速上手
+### 1.2 快速上手
 
 ```bash
 # 看看有哪些新闻源
@@ -72,7 +71,7 @@ news get weibo -k "端午,AI"
 news get hackernews --json | jq '.[].title'
 ```
 
-### 常用命令
+### 1.3 常用命令
 
 ```bash
 news list                       # 列出所有新闻源
@@ -84,7 +83,7 @@ news get <source> -k "a,b"     # 关键词过滤
 news get <source> --json       # JSON 输出
 ```
 
-### 使用代理
+### 1.4 使用代理
 
 访问 Hacker News、BBC 等海外源时，设置环境变量即可：
 
@@ -94,7 +93,7 @@ export http_proxy=http://127.0.0.1:8118
 news get hackernews -c top -l 5
 ```
 
-### 内置新闻源
+### 1.5 内置新闻源
 
 | 源名 | 说明 | 分类数 | 默认分类 |
 |------|------|--------|----------|
@@ -167,11 +166,11 @@ news get hackernews -c top -l 5
 
 ---
 
-## 🛠️ 开发者指南
+## 二、开发者指南
 
 如果你想改代码、加新闻源或写插件，看这里。
 
-### 本地开发
+### 2.1 本地开发
 
 ```bash
 npm run dev          # tsx 热运行
@@ -183,7 +182,7 @@ npm run lint:fix     # ESLint 自动修复
 npm run typecheck    # tsc 类型检查
 ```
 
-### 项目结构
+### 2.2 项目结构
 
 ```
 src/
@@ -208,7 +207,7 @@ scripts/build.js          # esbuild 构建脚本
 site/                     # 项目官网（Vite + React + Tailwind）
 ```
 
-### 如何新增一个新闻源
+### 2.3 如何新增一个新闻源
 
 1. 在 `src/news-source/` 下新建文件夹
 2. 创建 `index.ts`，实现 `NewsSource` 接口
@@ -233,7 +232,7 @@ export const mySource: NewsSource = {
 };
 ```
 
-### 插件机制
+### 2.4 插件机制
 
 插件在启动时被动态加载，可以注册新的新闻源或 CLI 命令。
 
@@ -276,7 +275,7 @@ export const plugin = {
 };
 ```
 
-### 项目官网
+### 2.5 项目官网
 
 `site/` 是项目官网源码，用 React + Vite + TypeScript + Tailwind CSS 写成：
 
@@ -293,6 +292,6 @@ npm test
 
 ---
 
-## 📜 许可
+## 三、许可
 
 [MIT](LICENSE) © xw-meow
