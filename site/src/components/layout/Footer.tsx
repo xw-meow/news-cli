@@ -1,4 +1,8 @@
+import { useI18n } from '../../i18n/I18nProvider';
+
 export function Footer() {
+  const { lang, setLang, t } = useI18n();
+
   return (
     <footer className="relative mt-auto">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
@@ -9,14 +13,42 @@ export function Footer() {
           </div>
 
           <div className="flex items-center gap-6 text-xs text-gray-500">
-            <a href="#" className="hover:text-green-400 transition-colors">GitHub</a>
-            <a href="#" className="hover:text-green-400 transition-colors">Issues</a>
-            <a href="#" className="hover:text-green-400 transition-colors">文档</a>
+            <a
+              href="https://github.com/xw-meow/news-cli"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-green-400 transition-colors"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://github.com/xw-meow/news-cli/issues"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-green-400 transition-colors"
+            >
+              Issues
+            </a>
+            <a
+              href="https://github.com/xw-meow/news-cli#readme"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-green-400 transition-colors"
+            >
+              {lang === 'zh' ? '文档' : 'Docs'}
+            </a>
+            <button
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              className="hover:text-green-400 transition-colors"
+              aria-label="Toggle language"
+            >
+              {lang === 'zh' ? 'English' : '中文'}
+            </button>
           </div>
         </div>
 
         <div className="mt-6 text-center text-[11px] text-gray-600">
-          news-cli · 命令行新闻聚合器 · 17 个新闻源 · 插件扩展
+          news-cli · {t.footerBuilt} · 17 {t.statSources}
         </div>
       </div>
     </footer>

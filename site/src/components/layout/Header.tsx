@@ -1,16 +1,20 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-
-const links = [
-  { to: '/', label: '首页' },
-  { to: '/install', label: '安装' },
-  { to: '/commands', label: '命令' },
-  { to: '/sources', label: '新闻源' },
-];
+import { useState } from 'react';
+import { useI18n } from '../../i18n/I18nProvider';
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const { lang, setLang, t } = useI18n();
+
+  const links = [
+    { to: '/', label: t.home },
+    { to: '/install', label: t.install },
+    { to: '/commands', label: t.commands },
+    { to: '/sources', label: t.sources },
+  ];
+
+  const toggleLang = () => setLang(lang === 'zh' ? 'en' : 'zh');
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-gray-800/80">
@@ -45,6 +49,13 @@ export function Header() {
               </Link>
             );
           })}
+          <button
+            onClick={toggleLang}
+            className="ml-2 px-2.5 py-1 text-xs rounded-lg border border-gray-700 text-gray-400 hover:border-green-400/40 hover:text-green-400 transition-colors"
+            aria-label="Toggle language"
+          >
+            {lang === 'zh' ? 'EN' : '中文'}
+          </button>
         </nav>
 
         {/* Mobile hamburger */}
@@ -75,7 +86,7 @@ export function Header() {
       <div
         className={`
           md:hidden overflow-hidden transition-all duration-300 ease-in-out
-          ${open ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}
+          ${open ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'}
         `}
       >
         <nav className="bg-gray-950/95 border-t border-gray-800 px-6 py-3 flex flex-col gap-1">
@@ -92,6 +103,15 @@ export function Header() {
               {l.label}
             </Link>
           ))}
+          <button
+            onClick={() => {
+              toggleLang();
+              setOpen(false);
+            }}
+            className="text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-colors"
+          >
+            {lang === 'zh' ? 'Switch to English' : '切换为中文'}
+          </button>
         </nav>
       </div>
     </header>

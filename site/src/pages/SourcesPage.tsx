@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react';
 import { SourceCard } from '../components/ui/SourceCard';
 import { GlowCard } from '../components/ui/GlowCard';
 import { sources } from '../data/sources';
+import { useI18n } from '../i18n/I18nProvider';
 
 const typeFilters: Array<'All' | 'RSS' | 'JSON' | 'HTML'> = ['All', 'RSS', 'JSON', 'HTML'];
 
 export function SourcesPage() {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<typeof typeFilters[number]>('All');
 
@@ -33,42 +35,40 @@ export function SourcesPage() {
   return (
     <div className="max-w-6xl mx-auto px-6 pt-12 pb-16">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gradient mb-2">新闻源</h1>
+        <h1 className="text-3xl font-bold text-gradient mb-2">{t.sourcesPageTitle}</h1>
         <p className="text-sm text-gray-500">
-          内置 {sources.length} 个新闻源，覆盖中英文主流媒体与科技社区
+          {t.sourcesPageSubtitle.replace('{count}', String(sources.length))}
         </p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-        {typeFilters.map((t) => (
+        {typeFilters.map((filter) => (
           <GlowCard
-            key={t}
+            key={filter}
             hover={false}
             className={`p-4 cursor-pointer ${
-              typeFilter === t ? 'border-green-400/40 bg-green-400/5' : ''
+              typeFilter === filter ? 'border-green-400/40 bg-green-400/5' : ''
             }`}
           >
             <button
-              onClick={() => setTypeFilter(t)}
+              onClick={() => setTypeFilter(filter)}
               className="w-full text-left"
             >
               <div className="text-2xl font-bold text-gray-200">
-                {t === 'All' ? sources.length : typeCounts[t]}
+                {filter === 'All' ? sources.length : typeCounts[filter]}
               </div>
-              <div className="text-xs text-gray-500">{t === 'All' ? '全部' : t}</div>
+              <div className="text-xs text-gray-500">{filter === 'All' ? t.all : filter}</div>
             </button>
           </GlowCard>
         ))}
       </div>
 
-      {/* Search */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="搜索新闻源、分类…"
+          placeholder={t.searchPlaceholder}
           className="flex-1 bg-black/50 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-gray-200 placeholder-gray-600 outline-none focus:border-green-400/40 transition-colors"
         />
       </div>
@@ -82,7 +82,7 @@ export function SourcesPage() {
       {filtered.length === 0 && (
         <GlowCard className="text-center py-16">
           <div className="text-4xl mb-3">🔭</div>
-          <p className="text-gray-500 text-sm">没有匹配的新闻源</p>
+          <p className="text-gray-500 text-sm">{t.emptyTitle}</p>
           <button
             onClick={() => {
               setQuery('');
@@ -90,7 +90,7 @@ export function SourcesPage() {
             }}
             className="mt-3 text-xs text-green-400 hover:text-green-300"
           >
-            清除筛选
+            {t.clearFilter}
           </button>
         </GlowCard>
       )}

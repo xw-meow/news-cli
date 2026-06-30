@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { TerminalBlock } from './TerminalBlock';
+import { useI18n } from '../../i18n/I18nProvider';
 
 interface CommandDemo {
   input: string;
   outputLines: string[];
 }
 
-const demos: CommandDemo[] = [
+const demosZh: CommandDemo[] = [
   {
     input: 'news list',
     outputLines: [
@@ -36,12 +37,44 @@ const demos: CommandDemo[] = [
   },
 ];
 
+const demosEn: CommandDemo[] = [
+  {
+    input: 'news list',
+    outputLines: [
+      '  google-news   weibo         cls        ithome',
+      '  pengpai       chinanews     sspai      aibase',
+      '  tencent-news  36kr          people-cn  huxiu',
+      '  yicai         autohome      bbc        hackernews',
+      '  ---',
+      '  17 sources available',
+    ],
+  },
+  {
+    input: 'news get hackernews -c ask -l 3',
+    outputLines: [
+      '  #  Ask HN: How do you design a clean CLI tool?',
+      '  #  Ask HN: How do you test RSS parsers?',
+      '  #  Ask HN: Best tech stack to learn in 2026?',
+    ],
+  },
+  {
+    input: 'news get weibo -l 3 --json | jq \'.[].title\'',
+    outputLines: [
+      '  "Argentina fans change plans today"',
+      '  "Doubao daily revenue under 10M"',
+      '  "Cultural China Dragon Boat rituals"',
+    ],
+  },
+];
+
 export function TypingTerminal() {
+  const { lang } = useI18n();
   const [demoIndex, setDemoIndex] = useState(0);
   const [typed, setTyped] = useState('');
   const [showOutput, setShowOutput] = useState(false);
   const [phase, setPhase] = useState<'typing' | 'waiting' | 'erasing'>('typing');
 
+  const demos = lang === 'en' ? demosEn : demosZh;
   const current = demos[demoIndex]!;
 
   useEffect(() => {
@@ -76,7 +109,7 @@ export function TypingTerminal() {
       }, 200);
       return () => clearTimeout(t);
     }
-  }, [phase, typed, current, demoIndex]);
+  }, [phase, typed, current, demoIndex, demos]);
 
   return (
     <TerminalBlock
