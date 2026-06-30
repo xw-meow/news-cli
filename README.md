@@ -19,7 +19,8 @@
 <p>
   <a href="https://xw-meow.github.io/news-cli/">🌐 项目官网</a> ·
   <a href="#一-用户指南">用户指南</a> ·
-  <a href="#二-开发者指南">开发者指南</a>
+  <a href="#二-开发者指南">开发者指南</a> ·
+  <a href="./README.en.md">English</a>
 </p>
 
 <p>

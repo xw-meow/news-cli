@@ -20,7 +20,8 @@
 <p>
   <a href="https://xw-meow.github.io/news-cli/">🌐 Website</a> ·
   <a href="#i-user-guide">User Guide</a> ·
-  <a href="#ii-developer-guide">Developer Guide</a>
+  <a href="#ii-developer-guide">Developer Guide</a> ·
+  <a href="./README.md">中文</a>
 </p>
 
 <p>
