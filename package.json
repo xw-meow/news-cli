@@ -1,11 +1,17 @@
 {
-  "name": "news-cli",
+  "name": "xw-news-cli",
   "version": "0.1.0",
   "description": "CLI tool for fetching news from multiple sources",
   "type": "module",
   "bin": {
     "news": "./dist/index.js"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "node scripts/build.js",

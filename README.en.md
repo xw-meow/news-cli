@@ -40,7 +40,7 @@ If you just want to use the CLI, read this section.
 ### 1.1 Installation
 
 ```bash
-npm install -g news-cli
+npm install -g xw-news-cli
 ```
 
 Or build from source:

@@ -39,7 +39,7 @@
 ### 1.1 安装
 
 ```bash
-npm install -g news-cli
+npm install -g xw-news-cli
 ```
 
 或者用源码自己构建：

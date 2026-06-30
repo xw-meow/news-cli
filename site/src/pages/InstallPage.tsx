@@ -9,7 +9,7 @@ export function InstallPage() {
   const steps = [
     {
       title: t.stepInstall,
-      command: 'npm install -g news-cli',
+      command: 'npm install -g xw-news-cli',
       description: t.installCmdDesc,
     },
     {
