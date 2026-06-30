@@ -6,6 +6,7 @@ import type { SourceData } from '../../data/sources';
 const mockSource: SourceData = {
   name: 'test-source',
   description: 'A test source',
+  descriptionEn: 'A test source',
   type: 'JSON',
   categories: ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'],
 };

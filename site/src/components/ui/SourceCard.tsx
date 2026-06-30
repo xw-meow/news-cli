@@ -1,5 +1,6 @@
 import type { SourceData } from '../../data/sources';
 import { GlowCard } from './GlowCard';
+import { useI18n } from '../../i18n/I18nProvider';
 
 interface SourceCardProps {
   source: SourceData;
@@ -14,6 +15,7 @@ const typeStyles: Record<SourceData['type'], { bg: string; text: string; border:
 const maxVisibleCategories = 3;
 
 export function SourceCard({ source }: SourceCardProps) {
+  const { lang } = useI18n();
   const visibleCategories = source.categories.slice(0, maxVisibleCategories);
   const remaining = source.categories.length - maxVisibleCategories;
   const styles = typeStyles[source.type];
@@ -31,7 +33,9 @@ export function SourceCard({ source }: SourceCardProps) {
           {source.type}
         </span>
       </div>
-      <p className="text-gray-400 text-xs mb-3 leading-relaxed flex-1">{source.description}</p>
+      <p className="text-gray-400 text-xs mb-3 leading-relaxed flex-1">
+        {lang === 'en' ? source.descriptionEn : source.description}
+      </p>
       {visibleCategories.length > 0 && (
         <div className="flex gap-1 flex-wrap">
           {visibleCategories.map((cat) => (
