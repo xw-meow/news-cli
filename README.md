@@ -286,10 +286,6 @@ npm run dev
 npm test
 ```
 
-项目官网：
-
-👉 [https://xw-meow.github.io/news-cli/](https://xw-meow.github.io/news-cli/)
-
 ---
 
 ## 三、许可
