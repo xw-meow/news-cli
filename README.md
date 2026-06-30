@@ -113,6 +113,7 @@ export const plugin = {
 | `yicai` | 第一财经 — 首页 script JSON 解析，头条+最新 | 2 | `最新` |
 | `autohome` | 汽车之家 — HTML 解析 + 逐页分页，11 个分类 | 11 | `最新` |
 | `bbc` | BBC News — Content Collection API 翻页，7 个分类 | 7 | `technology` |
+| `hackernews` | Hacker News — hnrss.org 镜像，科技新闻聚合与讨论 | 5 | `new` |
 
 ### google-news / google-news-cn
 
@@ -245,6 +246,20 @@ BBC News JSON API 抓取，通过 Content Collection API 分页翻页。
 - `publishedAt` 使用 `firstPublishedAt` 字段，`category` 取 `topics[0]`
 - 非 `article` 类型（video 等）自动过滤
 
+### hackernews
+
+Hacker News RSS 抓取，使用 hnrss.org 镜像（官方 RSS 仅支持 top stories）。
+
+5 个分类：`top` `new` `ask` `show` `jobs`
+
+- `top` → `https://hnrss.org/frontpage`
+- `new` → `https://hnrss.org/newest`
+- `ask` → `https://hnrss.org/ask`
+- `show` → `https://hnrss.org/show`
+- `jobs` → `https://hnrss.org/jobs`
+
+默认分类为 `new`。关键词通过 `titleContains` 本地标题匹配。文章 URL 取 RSS 的 `<link>`，回退到 `<comments>`；`publishedAt` 使用 `<pubDate>`。
+
 ## 开发
 
 ```bash
@@ -339,11 +354,15 @@ src/
 │       ├── index.ts               # BBC News（JSON API 翻页，7 个分类）
 │       ├── parser.ts              # JSON → NewsArticle[]
 │       └── constants.ts           # 分类-collectionId 映射、API 配置
+│   └── hackernews/
+│       ├── index.ts               # Hacker News（官方 RSS）
+│       ├── parser.ts              # RSS XML → NewsArticle[]
+│       └── constants.ts           # RSS URL、默认值
 └── utils/
     ├── index.ts                   # 公共工具：sleep() / titleContains()
     └── logger.ts                  # stderr 日志
 
-test/                              # vitest 测试用例 (388 tests, 39 files)
+test/                              # vitest 测试用例 (398 tests, 40 files)
 scripts/build.js                   # esbuild 构建脚本
 site/                              # 介绍站点 (Vite + React + TS + Tailwind, 16 tests)
 ```

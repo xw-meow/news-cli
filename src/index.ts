@@ -17,6 +17,7 @@ import { huxiuSource } from './news-source/huxiu/index.js';
 import { yicaiSource } from './news-source/yicai/index.js';
 import { autohomeSource } from './news-source/autohome/index.js';
 import { bbcSource } from './news-source/bbc/index.js';
+import { hackernewsSource } from './news-source/hackernews/index.js';
 
 // 注册所有新闻源
 registerSource(googleNewsSource);
@@ -35,6 +36,7 @@ registerSource(huxiuSource);
 registerSource(yicaiSource);
 registerSource(autohomeSource);
 registerSource(bbcSource);
+registerSource(hackernewsSource);
 
 // 加载动态插件 → 启动 CLI
 const program = createCLI();

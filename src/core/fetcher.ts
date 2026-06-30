@@ -1,5 +1,6 @@
 import { NewsCliError } from './types.js';
 import { sleep } from '../utils/index.js';
+import { fetch as undiciFetch, ProxyAgent, RequestInit as UndiciRequestInit } from 'undici';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
@@ -7,8 +8,26 @@ const RETRY_DELAY_MS = 1000;
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 
+function getProxyUrl(targetUrl: string): string | undefined {
+  return targetUrl.startsWith('https')
+    ? process.env.https_proxy || process.env.HTTPS_PROXY
+    : process.env.http_proxy || process.env.HTTP_PROXY;
+}
+
+function fetchWithProxy(url: string, init: RequestInit): Promise<Response> {
+  const proxyUrl = getProxyUrl(url);
+  if (!proxyUrl) {
+    // 无代理时复用全局 fetch，保持与现有测试 mock 的兼容性
+    return fetch(url, init);
+  }
+  return undiciFetch(url, {
+    ...init,
+    dispatcher: new ProxyAgent({ uri: proxyUrl }),
+  } as UndiciRequestInit);
+}
+
 /**
- * 通用文本抓取：超时控制 + 重试 + UA 伪装
+ * 通用文本抓取：超时控制 + 重试 + UA 伪装 + 代理支持
  * @param url - 请求地址
  * @param timeoutMs - 超时毫秒数
  * @returns 响应文本
@@ -19,7 +38,7 @@ async function fetchText(url: string, timeoutMs: number, extraHeaders?: Record<s
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-      const response = await fetch(url, {
+      const response = await fetchWithProxy(url, {
         headers: { 'User-Agent': USER_AGENT, ...extraHeaders },
         signal: controller.signal,
       });
@@ -130,7 +149,7 @@ export async function fetchJSON<T>(
         init.body = body;
       }
 
-      const response = await fetch(url, init);
+      const response = await fetchWithProxy(url, init);
 
       clearTimeout(timer);
 
@@ -180,7 +199,7 @@ export async function fetchBinary(url: string, timeoutMs: number): Promise<Buffe
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-      const response = await fetch(url, {
+      const response = await fetchWithProxy(url, {
         headers: { 'User-Agent': USER_AGENT },
         signal: controller.signal,
       });
