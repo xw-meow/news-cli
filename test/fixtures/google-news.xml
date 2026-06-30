@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Google News</title>
+    <item>
+      <title>Test Article One - Example Source</title>
+      <link>https://news.google.com/rss/articles/abc123</link>
+      <guid isPermaLink="false">abc123</guid>
+      <pubDate>Mon, 15 Jun 2026 08:00:00 GMT</pubDate>
+      <description>This is the snippet for article one.</description>
+      <source url="https://example.com">Example Source</source>
+    </item>
+    <item>
+      <title>Second Article - Another Source</title>
+      <link>https://news.google.com/rss/articles/def456</link>
+      <guid isPermaLink="false">def456</guid>
+      <pubDate>Mon, 15 Jun 2026 07:30:00 GMT</pubDate>
+      <description>Snippet for the second article.</description>
+      <source url="https://another.com">Another Source</source>
+    </item>
+    <item>
+      <title>Article Without Source</title>
+      <link>https://news.google.com/rss/articles/ghi789</link>
+      <guid isPermaLink="false">ghi789</guid>
+      <pubDate>Mon, 15 Jun 2026 07:00:00 GMT</pubDate>
+      <description>No source element here.</description>
+    </item>
+  </channel>
+</rss>
