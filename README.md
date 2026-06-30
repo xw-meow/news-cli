@@ -286,7 +286,7 @@ npm run dev
 npm test
 ```
 
-官网通过 GitHub Actions 自动部署到：
+项目官网：
 
 👉 [https://xw-meow.github.io/news-cli/](https://xw-meow.github.io/news-cli/)
 
