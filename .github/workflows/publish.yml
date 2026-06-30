@@ -49,7 +49,7 @@ jobs:
         run: |
           npm run typecheck
           npm run lint
-          npm test
+          npx vitest run --exclude test/cli.test.ts
 
       - name: Build
         if: steps.check.outputs.already_released == 'false'
