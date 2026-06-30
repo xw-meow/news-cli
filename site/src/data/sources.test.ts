@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { sources } from './sources';
 
 describe('sources data', () => {
-  it('has 16 sources', () => {
-    expect(sources).toHaveLength(16);
+  it('has 17 sources', () => {
+    expect(sources).toHaveLength(17);
   });
 
   it('every source has required fields', () => {

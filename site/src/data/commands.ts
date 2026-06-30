@@ -23,10 +23,13 @@ export const commands: CommandData[] = [
       { flag: '-l, --limit <n>', description: '限制返回条数（默认 20）' },
       { flag: '-k, --keyword <kw>', description: '关键词过滤，逗号分隔 = OR 逻辑，不区分大小写' },
       { flag: '--json', description: 'JSON 输出，管道友好，可与 jq 配合' },
+      { flag: 'http_proxy / https_proxy', description: '设置环境变量后自动走代理访问海外源' },
     ],
     examples: [
       'news get weibo -l 10',
       'news get google-news -c technology -k "AI,LLM"',
+      'news get hackernews -c ask -l 5',
+      'news get hackernews -k "AI,open source" --json',
       'news get 36kr --json | jq \'.[].title\'',
     ],
   },

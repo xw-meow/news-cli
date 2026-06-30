@@ -102,4 +102,10 @@ export const sources: SourceData[] = [
     type: 'JSON',
     categories: ['technology', 'business', 'health', 'culture', 'arts', 'travel', 'business-more'],
   },
+  {
+    name: 'hackernews',
+    description: 'Hacker News — hnrss.org 镜像，科技新闻聚合与讨论',
+    type: 'RSS',
+    categories: ['top', 'new', 'ask', 'show', 'jobs'],
+  },
 ];

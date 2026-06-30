@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { TerminalBlock } from '../components/ui/TerminalBlock';
+import { GlowCard } from '../components/ui/GlowCard';
 import { commands, type CommandData } from '../data/commands';
 
 function groupCommands(cmds: CommandData[]): Map<string, CommandData[]> {
@@ -20,59 +21,86 @@ export function CommandsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 pt-12 pb-16">
-      <h1 className="text-2xl font-bold text-gray-200 mb-1">命令参考</h1>
-      <p className="text-sm text-gray-500 mb-8">news-cli 完整命令列表</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gradient mb-2">命令参考</h1>
+        <p className="text-sm text-gray-500">news-cli 完整命令列表与示例</p>
+      </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar */}
-        <aside className="lg:w-48 flex-shrink-0">
-          {groupNames.map((group) => (
-            <div key={group} className="mb-4">
-              <div className="text-[11px] text-gray-600 uppercase tracking-wider mb-2">{group}</div>
-              <div className="flex flex-col gap-0.5">
-                {(grouped.get(group) ?? []).map((cmd) => (
-                  <button
-                    key={cmd.name}
-                    onClick={() => setSelected(cmd)}
-                    className={`text-left px-2.5 py-1.5 rounded text-sm transition-colors ${
-                      selected?.name === cmd.name
-                        ? 'text-green-400 bg-green-400/8 font-medium'
-                        : 'text-gray-500 hover:text-gray-300'
-                    }`}
-                  >
-                    {cmd.name}
-                  </button>
-                ))}
+        <aside className="lg:w-56 flex-shrink-0">
+          <GlowCard className="p-3" hover={false}>
+            {groupNames.map((group) => (
+              <div key={group} className="mb-4 last:mb-0">
+                <div className="text-[11px] text-gray-600 uppercase tracking-wider mb-2 px-2">
+                  {group}
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  {(grouped.get(group) ?? []).map((cmd) => {
+                    const active = selected?.name === cmd.name;
+                    return (
+                      <button
+                        key={cmd.name}
+                        onClick={() => setSelected(cmd)}
+                        className={`
+                          text-left px-3 py-2 rounded-lg text-sm transition-all relative overflow-hidden
+                          ${
+                            active
+                              ? 'text-green-400 bg-green-400/8 font-medium'
+                              : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/50'
+                          }
+                        `}
+                      >
+                        {active && (
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-green-400 rounded-full" />
+                        )}
+                        <span className="pl-2">{cmd.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </GlowCard>
         </aside>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           {selected && (
-            <>
-              <h3 className="text-lg font-semibold text-gray-200 mb-0.5 font-mono">news {selected.name}</h3>
-              <p className="text-xs text-gray-500 mb-5">{selected.description}</p>
+            <GlowCard className="p-6" hover={false}>
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-200 mb-1 font-mono">
+                    news {selected.name}
+                  </h3>
+                  <p className="text-sm text-gray-500">{selected.description}</p>
+                </div>
+                <button
+                  className="hidden sm:inline-flex items-center gap-1.5 text-[11px] text-gray-500 border border-gray-800 rounded-lg px-2.5 py-1.5 hover:border-green-400/40 hover:text-green-400 transition-colors"
+                  onClick={() => navigator.clipboard?.writeText(`news ${selected.usage.replace(/^news /, '')}`)}
+                >
+                  复制命令
+                </button>
+              </div>
 
-              <div className="text-xs text-gray-400 mb-2">用法：</div>
-              <div className="mb-5">
+              <div className="text-xs text-gray-400 mb-2 font-medium">用法</div>
+              <div className="mb-6">
                 <TerminalBlock lines={[`$ ${selected.usage}`]} />
               </div>
 
               {selected.options.length > 0 && (
                 <>
-                  <div className="text-xs text-gray-400 mb-2">选项：</div>
-                  <div className="flex flex-col gap-1.5 mb-5">
+                  <div className="text-xs text-gray-400 mb-2 font-medium">选项</div>
+                  <div className="flex flex-col gap-2 mb-6">
                     {selected.options.map((opt) => (
                       <div
                         key={opt.flag}
-                        className="flex items-start gap-2.5 px-3 py-2 bg-gray-900 border border-gray-800 rounded-md"
+                        className="flex items-start gap-3 px-4 py-3 bg-black/40 border border-gray-800 rounded-xl"
                       >
                         <code className="text-amber-400 text-[11px] font-mono whitespace-nowrap flex-shrink-0">
                           {opt.flag}
                         </code>
-                        <span className="text-gray-400 text-[11px]">{opt.description}</span>
+                        <span className="text-gray-400 text-xs">{opt.description}</span>
                       </div>
                     ))}
                   </div>
@@ -81,7 +109,7 @@ export function CommandsPage() {
 
               {selected.examples.length > 0 && (
                 <>
-                  <div className="text-xs text-gray-400 mb-2">示例：</div>
+                  <div className="text-xs text-gray-400 mb-2 font-medium">示例</div>
                   <TerminalBlock
                     lines={selected.examples.flatMap((ex, i) => {
                       const parts: string[] = [`$ ${ex}`];
@@ -91,7 +119,7 @@ export function CommandsPage() {
                   />
                 </>
               )}
-            </>
+            </GlowCard>
           )}
         </div>
       </div>

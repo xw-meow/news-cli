@@ -10,11 +10,25 @@ interface TerminalBlockProps {
   showPrompt?: boolean;
   /** 是否显示红黄绿圆点，默认 true */
   showDots?: boolean;
+  className?: string;
 }
 
-export function TerminalBlock({ lines = [], table, showPrompt = true, showDots = true }: TerminalBlockProps) {
+export function TerminalBlock({
+  lines = [],
+  table,
+  showPrompt = true,
+  showDots = true,
+  className = '',
+}: TerminalBlockProps) {
   return (
-    <div className="bg-black border border-gray-800 rounded-lg p-5 font-mono text-sm leading-normal text-left overflow-x-auto">
+    <div
+      className={`
+        bg-black/80 border border-gray-800 rounded-xl
+        p-5 font-mono text-sm leading-normal text-left overflow-x-auto
+        glow-green
+        ${className}
+      `}
+    >
       {showDots && (
         <div className="flex gap-1.5 mb-3">
           <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
@@ -24,7 +38,7 @@ export function TerminalBlock({ lines = [], table, showPrompt = true, showDots =
       )}
 
       {lines.map((line, i) => (
-        <div key={i}>
+        <div key={i} className="whitespace-pre">
           {showPrompt && line.startsWith('$ ') ? (
             <>
               <span className="text-green-400">$</span>

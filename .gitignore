@@ -5,3 +5,4 @@ docs
 site/node_modules
 site/dist
 site/tsconfig.tsbuildinfo
+.DS_Store

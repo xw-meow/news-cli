@@ -8,3 +8,26 @@
     scrollbar-color: #1f1f1f transparent;
   }
 }
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent;
+  }
+
+  .glow-green {
+    box-shadow: 0 0 40px -12px rgba(74, 222, 128, 0.25);
+  }
+
+  .glow-amber {
+    box-shadow: 0 0 40px -12px rgba(251, 191, 36, 0.2);
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor-blink {
+  animation: blink 1s step-end infinite;
+}
