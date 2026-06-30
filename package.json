@@ -17,7 +17,14 @@
   },
   "keywords": [
     "news",
-    "cli"
+    "cli",
+    "news-cli",
+    "rss",
+    "aggregator",
+    "terminal",
+    "hackernews",
+    "news-source",
+    "plugin"
   ],
   "license": "MIT",
   "dependencies": {
