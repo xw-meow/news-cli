@@ -17,7 +17,6 @@
 
 <p>
   <a href="https://xw-meow.github.io/news-cli/">🌐 项目官网</a> ·
-  <a href="https://github.com/xw-meow/news-cli/actions"> Actions 构建状态</a> ·
   <a href="#-用户指南">用户指南</a> ·
   <a href="#-开发者指南">开发者指南</a>
 </p>
