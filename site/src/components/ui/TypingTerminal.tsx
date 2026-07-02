@@ -111,11 +111,16 @@ export function TypingTerminal() {
     }
   }, [phase, typed, current, demoIndex, demos]);
 
+  const maxOutputLines = Math.max(...demos.map((d) => d.outputLines.length));
+  const paddedOutput = showOutput
+    ? [...current.outputLines, ...Array(maxOutputLines - current.outputLines.length).fill('')]
+    : Array(maxOutputLines).fill('');
+
   return (
     <TerminalBlock
       lines={[
         `$ ${typed}${phase === 'typing' ? '▋' : ''}`,
-        ...(showOutput ? current.outputLines : []),
+        ...paddedOutput,
       ]}
       showDots
       showPrompt={false}

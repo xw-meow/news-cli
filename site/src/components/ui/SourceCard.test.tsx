@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { SourceCard } from './SourceCard';
+import { I18nProvider } from '../../i18n/I18nProvider';
 import type { SourceData } from '../../data/sources';
 
 const mockSource: SourceData = {
@@ -11,20 +12,24 @@ const mockSource: SourceData = {
   categories: ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'],
 };
 
+function renderWithI18n(ui: React.ReactElement) {
+  return render(<I18nProvider>{ui}</I18nProvider>);
+}
+
 describe('SourceCard', () => {
   it('renders source name and description', () => {
-    render(<SourceCard source={mockSource} />);
+    renderWithI18n(<SourceCard source={mockSource} />);
     expect(screen.getByText('test-source')).toBeDefined();
     expect(screen.getByText('A test source')).toBeDefined();
   });
 
   it('renders type badge', () => {
-    render(<SourceCard source={mockSource} />);
+    renderWithI18n(<SourceCard source={mockSource} />);
     expect(screen.getByText('JSON')).toBeDefined();
   });
 
   it('renders max 3 categories plus remainder', () => {
-    render(<SourceCard source={mockSource} />);
+    renderWithI18n(<SourceCard source={mockSource} />);
     expect(screen.getByText('cat1')).toBeDefined();
     expect(screen.getByText('cat2')).toBeDefined();
     expect(screen.getByText('cat3')).toBeDefined();
@@ -33,7 +38,7 @@ describe('SourceCard', () => {
   });
 
   it('renders no category tags when categories is empty', () => {
-    render(<SourceCard source={{ ...mockSource, categories: [] }} />);
+    renderWithI18n(<SourceCard source={{ ...mockSource, categories: [] }} />);
     expect(screen.queryByText('cat1')).toBeNull();
   });
 });

@@ -46,8 +46,10 @@ export function TerminalBlock({
             </>
           ) : line.startsWith('# ') ? (
             <span className="text-gray-500">{line}</span>
-          ) : (
+          ) : line.length > 0 ? (
             <span className="text-gray-400">{line}</span>
+          ) : (
+            <span className="select-none">&nbsp;</span>
           )}
         </div>
       ))}
