@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><<::topic 大字报名称>></title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      background: #e8e4dc;
+      font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
+      color: #3d3225;
+    }
+
+    .poster {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 28px;
+      background: #f3ebd8;
+      overflow: hidden;
+      box-shadow:
+        inset 0 0 80px rgba(139, 90, 43, 0.12),
+        0 12px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .poster::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+
+    .poster::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(139, 90, 43, 0.14) 0%, transparent 32%),
+        radial-gradient(circle at 88% 78%, rgba(160, 82, 45, 0.12) 0%, transparent 42%),
+        radial-gradient(circle at 52% 52%, rgba(0, 0, 0, 0.04) 0%, transparent 58%);
+    }
+
+    .masthead,
+    .date-line,
+    .lead,
+    .headline-article,
+    .section,
+    .sources {
+      position: relative;
+      z-index: 1;
+    }
+
+    .masthead {
+      border-bottom: 4px double #8b7355;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .masthead h1 {
+      margin: 0;
+      font-size: clamp(28px, 5.5vw, 44px);
+      font-weight: 900;
+      letter-spacing: 8px;
+      line-height: 1.1;
+    }
+
+    .tagline {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: #6b5a45;
+      margin-top: 8px;
+      text-transform: uppercase;
+    }
+
+    .date-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #6b5a45;
+      border-top: 1px solid #b8a890;
+      border-bottom: 1px solid #b8a890;
+      padding: 6px 0;
+      margin-bottom: 18px;
+    }
+
+    .lead {
+      font-size: 14px;
+      line-height: 1.75;
+      text-align: justify;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #c8b89a;
+    }
+
+    .drop-cap {
+      float: left;
+      font-size: 42px;
+      line-height: 0.9;
+      margin-right: 7px;
+      margin-top: 2px;
+      font-weight: 900;
+      color: #5c4a35;
+    }
+
+    .headline-article {
+      margin-bottom: 22px;
+    }
+
+    .headline {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 900;
+      line-height: 1.25;
+      margin: 0 0 14px;
+      text-align: justify;
+    }
+
+    .headline a {
+      color: #3d3225;
+      text-decoration: none;
+      border-bottom: 2px solid #8b7355;
+    }
+
+    .headline a:hover {
+      color: #5c4a35;
+      border-bottom-color: #5c4a35;
+    }
+
+    .columns {
+      column-count: 2;
+      column-gap: 24px;
+      column-rule: 1px solid #c8b89a;
+      font-size: 13px;
+      line-height: 1.75;
+      text-align: justify;
+    }
+
+    .columns p {
+      margin: 0 0 10px;
+    }
+
+    .insight {
+      display: block;
+      margin-top: 6px;
+      font-weight: 900;
+      color: #5c4a35;
+    }
+
+    .section {
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #5c4a35;
+      border-bottom: 1px solid #c8b89a;
+      padding-bottom: 6px;
+      margin: 0 0 14px;
+    }
+
+    .article {
+      margin-bottom: 16px;
+    }
+
+    .article-title {
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1.35;
+      margin: 0 0 8px;
+    }
+
+    .article-title a {
+      color: #3d3225;
+      text-decoration: none;
+      border-bottom: 1px solid #b8a890;
+    }
+
+    .article-title a:hover {
+      color: #5c4a35;
+      border-bottom-color: #8b7355;
+    }
+
+    .article p {
+      font-size: 13px;
+      line-height: 1.7;
+      text-align: justify;
+      margin: 0 0 8px;
+    }
+
+    .sources {
+      border-top: 1px solid #c8b89a;
+      padding-top: 16px;
+    }
+
+    .sources .section-title {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 10px;
+    }
+
+    .source-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      column-count: 2;
+      column-gap: 24px;
+      font-size: 12px;
+      color: #6b5a45;
+    }
+
+    .source-list li {
+      margin-bottom: 6px;
+      break-inside: avoid;
+    }
+
+    @media (max-width: 640px) {
+      .poster {
+        padding: 20px;
+      }
+
+      .masthead h1 {
+        letter-spacing: 4px;
+      }
+
+      .date-line {
+        flex-direction: column;
+        gap: 4px;
+        align-items: center;
+        text-align: center;
+      }
+
+      .columns,
+      .source-list {
+        column-count: 1;
+      }
+
+      .drop-cap {
+        font-size: 36px;
+        margin-right: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="poster">
+    <header class="masthead">
+      <h1><<::topic>></h1>
+      <div class="tagline">THE DAILY INTELLIGENCE · 第 <<::issueNumber 期号>> 期</div>
+    </header>
+
+    <div class="date-line">
+      <span><<::dateCn 中文日期，例如“公元二〇二六年七月三日”>> · <<::weekday 星期几>></span>
+      <span><<::reportType 报告类型，例如“AI 行业日报大字报">></span>
+      <span>共 <<::articleCount 文章总数>> 条精选</span>
+    </div>
+
+    <div class="lead">
+      <p><span class="drop-cap">据</span><<::lead 用 2-3 句话概括今日最核心的趋势、事件或变化，不展开具体文章>></p>
+    </div>
+
+    <article class="headline-article">
+      <h2 class="headline">
+        <a href="<<::headlineUrl 头条文章URL>>" target="_blank" rel="noopener"><<::headlineTitle 头条文章标题>></a>
+      </h2>
+      <div class="columns">
+        <p><<::headlineSummary 用 2-3 句话准确概括头条文章内容，仅基于标题和摘要，不编造超出范围的事实>></p>
+        <p><span class="insight"><<::headlineInsight 用 1 句话给出头条洞察、影响或读者应关注的关键点>></span></p>
+      </div>
+    </article>
+
+    <section class="section">
+      <h3 class="section-title"><<::sectionTitle 分组标题，按主题聚合相关文章，例如“大模型动态">></h3>
+
+      <article class="article">
+        <h4 class="article-title">
+          <a href="<<::articleUrl 文章URL>>" target="_blank" rel="noopener"><<::articleTitle 文章标题>></a>
+        </h4>
+        <p><<::articleSummary 用 2-3 句话准确概括文章内容，仅基于标题和摘要，不编造超出范围的事实>></p>
+        <p><span class="insight"><<::articleInsight 用 1 句话给出洞察、影响或读者应关注的关键点>></span></p>
+      </article>
+
+      <!-- Repeat the <article> block above for each additional article in this section. -->
+    </section>
+
+    <!-- Repeat the <section class="section"> block above for each additional section. -->
+
+    <section class="sources">
+      <h3 class="section-title">今日来源</h3>
+      <ul class="source-list">
+        <li><<::sourceName 来源名称>>: <<::sourceCount 该来源入选文章数>> 条</li>
+        <!-- Repeat the <li> above for each additional source. -->
+      </ul>
+    </section>
+  </div>
+</body>
+</html>
