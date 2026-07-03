@@ -61,11 +61,12 @@ Run `list-sources.js`. It writes `./tmp/available-sources.json` with `available`
 ```json
 {
   "topic": "AI 行业早报",
+  "format": "html",
   "style": "正式",
   "length": "中",
   "keywords": ["大模型", "OpenAI"],
   "date": "2026-07-03",
-  "outputFile": "docs/ai-daily.md",
+  "outputFile": "docs/ai-daily.html",
   "sources": [
     {"name": "aibase"},
     {"name": "36kr"}
@@ -73,6 +74,8 @@ Run `list-sources.js`. It writes `./tmp/available-sources.json` with `available`
   "targetCount": 10
 }
 ```
+
+For Markdown output, set `"format": "markdown"` (or omit the field) and use `"outputFile": "docs/ai-daily.md"`.
 
 ## Step 2–3: Fetch and Select
 
@@ -106,7 +109,7 @@ If `report-plan.json.format === "html"`, write `./tmp/report-content.html` inste
 **Template file (MUST follow):** `skills/professional-daily-report/reference/daily-report-template.html`
 
 **Rules:**
-1. Replace every `<<::identifier description>>` placeholder with real content and remove the markers.
+1. Replace every `<<::identifier description>>` placeholder with real content and remove the markers. Use only the placeholder identifiers that appear in `daily-report-template.html`.
 2. Output a complete, self-contained HTML file with embedded CSS.
 3. Article titles must be clickable bold `<a>` links to the original URL.
 4. Insight sentences must be wrapped in `<strong>` so they stand out from the summary.

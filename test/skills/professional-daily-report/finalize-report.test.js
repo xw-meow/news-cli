@@ -8,6 +8,7 @@ import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const SCRIPT = join(__dirname, '../../../skills/professional-daily-report/scripts/finalize-report.js');
+const TEMPLATE = join(__dirname, '../../../skills/professional-daily-report/reference/daily-report-template.html');
 
 function makeWorkDir() {
   return mkdtempSync(join(tmpdir(), 'finalize-report-'));
@@ -75,6 +76,27 @@ describe('finalize-report', () => {
     expect(output).toContain('news-cli + professional-daily-report skill');
 
     expect(existsSync(join(workDir, 'tmp'))).toBe(false);
+  });
+
+  it('writes the Markdown report when format is explicitly markdown', () => {
+    const plan = {
+      topic: 'Explicit Markdown',
+      format: 'markdown',
+      date: '2026-07-04',
+      sources: [{ name: 'aibase' }],
+      targetCount: 1,
+    };
+    const articles = [{ title: 'Article One', url: 'https://example.com/1', source: 'aibase' }];
+    writeFixture(workDir, plan, articles, '# Explicit Markdown\n\nBody.\n');
+
+    const result = runFinalize(workDir);
+
+    expect(result.status).toBe(0);
+    expect(result.stderr).toContain('[finalize] wrote daily/docs/daily-report-2026-07-04.md (1 articles)');
+
+    const outputFile = join(workDir, 'daily', 'docs', 'daily-report-2026-07-04.md');
+    expect(existsSync(outputFile)).toBe(true);
+    expect(readFileSync(outputFile, 'utf8')).toContain('生成于');
   });
 
   it('writes the default HTML report and skips Markdown footer when format is html', () => {
@@ -193,5 +215,30 @@ describe('finalize-report', () => {
 
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('Selected file not found');
+  });
+
+  it('HTML reference template contains required placeholders and doctype', () => {
+    const template = readFileSync(TEMPLATE, 'utf8');
+
+    expect(template).toContain('<!DOCTYPE html>');
+    expect(template).toContain('<<::topic');
+    expect(template).toContain('<<::englishTagline');
+    expect(template).toContain('<<::issueNumber');
+    expect(template).toContain('<<::date');
+    expect(template).toContain('<<::weekday');
+    expect(template).toContain('<<::reportType');
+    expect(template).toContain('<<::articleCount');
+    expect(template).toContain('<<::lead');
+    expect(template).toContain('<<::headlineUrl');
+    expect(template).toContain('<<::headlineTitle');
+    expect(template).toContain('<<::headlineSummary');
+    expect(template).toContain('<<::headlineInsight');
+    expect(template).toContain('<<::sectionTitle');
+    expect(template).toContain('<<::articleUrl');
+    expect(template).toContain('<<::articleTitle');
+    expect(template).toContain('<<::articleSummary');
+    expect(template).toContain('<<::articleInsight');
+    expect(template).toContain('<<::sourceName');
+    expect(template).toContain('<<::sourceCount');
   });
 });
