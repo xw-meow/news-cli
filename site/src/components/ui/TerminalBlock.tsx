@@ -10,6 +10,8 @@ interface TerminalBlockProps {
   showPrompt?: boolean;
   /** 是否显示红黄绿圆点，默认 true */
   showDots?: boolean;
+  /** 长行是否自动换行（适合单条长 URL），默认 false */
+  breakAll?: boolean;
   className?: string;
 }
 
@@ -18,6 +20,7 @@ export function TerminalBlock({
   table,
   showPrompt = true,
   showDots = true,
+  breakAll = false,
   className = '',
 }: TerminalBlockProps) {
   return (
@@ -38,7 +41,7 @@ export function TerminalBlock({
       )}
 
       {lines.map((line, i) => (
-        <div key={i} className="whitespace-pre">
+        <div key={i} className={`${breakAll ? 'whitespace-pre-wrap break-all' : 'whitespace-pre'}`}>
           {showPrompt && line.startsWith('$ ') ? (
             <>
               <span className="text-green-400">$</span>
