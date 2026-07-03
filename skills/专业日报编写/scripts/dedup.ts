@@ -74,7 +74,7 @@ export function deduplicate(articles: NewsArticle[]): NewsArticle[] {
     used.add(i);
     for (let j = i + 1; j < list.length; j++) {
       if (used.has(j)) continue;
-      if (list[i].title === list[j].title) {
+      if (levenshteinSimilarity(list[i].title, list[j].title) >= 0.85) {
         group.push(list[j]);
         used.add(j);
       }
@@ -94,16 +94,41 @@ export function filterByKeywords(articles: NewsArticle[], keywords: string[]): N
   });
 }
 
-function scoreArticle(a: NewsArticle, keywords: string[]): number {
-  const now = Date.now();
+export interface ScoreBreakdown {
+  score: number;
+  recencyScore: number;
+  sourceScore: number;
+  keywordScore: number;
+}
+
+function scoreArticleDetailed(a: NewsArticle, keywords: string[], now: number): ScoreBreakdown {
   const age = now - parseDate(a.publishedAt);
   const recencyScore = Math.max(0, 1 - age / (1000 * 60 * 60 * 24 * 7));
   const sourceScore = sourceWeight[a.source] || 1;
-  const keywordScore = keywords.reduce((sum, k) => {
-    const t = `${a.title} ${a.snippet}`.toLowerCase();
-    return sum + (t.includes(k.toLowerCase()) ? 1 : 0);
-  }, 0);
-  return recencyScore * 3 + sourceScore * 2 + keywordScore;
+  const t = `${a.title} ${a.snippet}`.toLowerCase();
+  const keywordScore = keywords.reduce((sum, k) => sum + (t.includes(k.toLowerCase()) ? 1 : 0), 0);
+  return {
+    score: recencyScore * 3 + sourceScore * 2 + keywordScore,
+    recencyScore,
+    sourceScore,
+    keywordScore,
+  };
+}
+
+export function scoreArticle(a: NewsArticle, keywords: string[], now = Date.now()): number {
+  return scoreArticleDetailed(a, keywords, now).score;
+}
+
+function buildReason(s: ScoreBreakdown): string {
+  const parts: string[] = [];
+  parts.push(`来源权重${s.sourceScore}`);
+  parts.push(`时效分${s.recencyScore.toFixed(2)}`);
+  if (s.keywordScore > 0) {
+    parts.push(`命中${s.keywordScore}个关键词`);
+  } else {
+    parts.push('未命中关键词');
+  }
+  return parts.join('，');
 }
 
 export function selectArticles(
@@ -114,10 +139,13 @@ export function selectArticles(
   list = deduplicate(list);
   list.sort((a, b) => scoreArticle(b, opts.keywords) - scoreArticle(a, opts.keywords));
   const selected = list.slice(0, opts.targetCount);
-  return selected.map(a => ({
-    ...a,
-    selectedReason: '来源权威、时效性高、与主题高度相关',
-  }));
+  return selected.map(a => {
+    const s = scoreArticleDetailed(a, opts.keywords, Date.now());
+    return {
+      ...a,
+      selectedReason: buildReason(s),
+    };
+  });
 }
 
 export function writeSelected(data: SelectedArticles, path = './tmp/selected-articles.json'): void {
