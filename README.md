@@ -177,7 +177,7 @@ news get hackernews -c top -l 5
 ```bash
 npm run dev          # tsx 热运行
 npm run build        # esbuild 打包 → dist/index.js
-npm test             # vitest 跑测试（398 tests, 40 files）
+npm test             # vitest 跑测试（407 tests, 41 files）
 npm run test:watch   # vitest 监听模式
 npm run lint         # ESLint 检查
 npm run lint:fix     # ESLint 自动修复
@@ -208,6 +208,16 @@ test/                     # vitest 测试用例
 scripts/build.js          # esbuild 构建脚本
 site/                     # 项目官网（Vite + React + Tailwind）
 skills/                   # OpenCode AI skills
+├── professional-daily-report/  # Markdown / HTML 大字报日报
+│   ├── SKILL.md
+│   ├── reference/
+│   │   ├── daily-report-template.md
+│   │   └── daily-report-template.html
+│   └── scripts/
+│       ├── list-sources.js
+│       ├── fetch-articles.js
+│       ├── dedup-articles.js
+│       └── finalize-report.js
 ```
 
 ### 2.3 如何新增一个新闻源
@@ -291,7 +301,7 @@ npm test
 
 ### 2.6 AI Skill：professional-daily-report
 
-项目内置了一个 OpenCode Skill，用于自动生成博客 / Newsletter 风格的 Markdown 日报。
+项目内置了一个 OpenCode Skill，用于自动生成博客 / Newsletter 风格的日报，支持 **Markdown** 或 **HTML 大字报** 两种输出格式。
 
 位置：`skills/professional-daily-report/`
 
@@ -301,14 +311,19 @@ npm test
 帮我写一份今天的 AI 行业日报，面向 AI 从业者，正式风格，10 条左右，保存到 docs/ai-daily.md
 ```
 
-它会自动：
-1. 解析主题、读者、风格、篇幅、输出文件。
-2. 按主题推荐新闻源。
-3. 调用 `news get --json` 并行抓取。
-4. 去重、筛选、排序。
-5. 生成带导语、分栏、观点、来源统计的 Markdown 日报。
+```text
+帮我生成一份今天的 AI 行业 HTML 大字报，旧报纸风格
+```
 
-详见 `skills/professional-daily-report/SKILL.md`。
+它会自动：
+1. 询问输出格式（Markdown 或 HTML 大字报）。
+2. 解析主题、读者、风格、篇幅、输出文件。
+3. 按主题推荐新闻源。
+4. 调用 `news get --json` 并行抓取。
+5. 去重、筛选、排序。
+6. 生成带导语、分栏、观点、来源统计的 Markdown 日报，或自包含的 HTML 大字报（纸质感、报纸头版风格）。
+
+详见 `skills/professional-daily-report/SKILL.md`。默认输出到 `./daily/docs/daily-report-YYYY-MM-DD.{md,html}`。
 
 ---
 
