@@ -24,9 +24,31 @@ export function buildCommand(plan: SourcePlan): string {
 }
 
 export function fetchSource(plan: SourcePlan): NewsArticle[] {
+  try {
+    execSync('command -v news', { encoding: 'utf8', stdio: 'ignore' });
+  } catch {
+    throw new Error(
+      'The `news` CLI is not available in PATH. Please run `npm run build && npm link` from the project root.',
+    );
+  }
+
   const cmd = buildCommand(plan);
-  const output = execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
-  return JSON.parse(output) as NewsArticle[];
+  let output: string;
+  try {
+    output = execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+  } catch (err) {
+    const status = err instanceof Error && 'status' in err ? (err as { status: number | null }).status : null;
+    const stderr = err instanceof Error && 'stderr' in err ? String((err as { stderr: Buffer | string }).stderr) : '';
+    const detail = `exit code ${status ?? 'unknown'}${stderr ? `, stderr: ${stderr.trim()}` : ''}`;
+    throw new Error(`Failed to fetch source "${plan.name}" (${detail})`);
+  }
+
+  try {
+    return JSON.parse(output) as NewsArticle[];
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(`Failed to parse news output as JSON for source "${plan.name}": ${message}`);
+  }
 }
 
 export function fetchSourceToFile(plan: SourcePlan, outDir = './tmp'): string {
