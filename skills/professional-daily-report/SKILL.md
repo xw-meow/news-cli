@@ -18,28 +18,39 @@ Generate a polished Markdown daily report / newsletter from `news get --json` ou
 - User only wants raw headlines → run `news get` directly
 - User wants real-time single-source output → no rewriting needed
 
+## Output Format
+
+At the start, ask the user:
+
+> 你要生成 Markdown 日报，还是 HTML 大字报？
+
+- Markdown → existing workflow, output `.md`
+- HTML 大字报 → this new branch, output `.html`
+
 ## Quick Reference
 
 | Field | Required | Default | Maps to |
 |---|---|---|---|
 | `topic` | yes | — | report title |
+| `format` | no | `markdown` | `markdown` or `html` |
 | `style` | no | 平衡 | tone (正式 / 轻松 / 深度 / 短讯) |
 | `length` | no | 中 | `targetCount`: 短=5–7, 中=8–12, 长=13–20 |
 | `keywords` | no | [] | filter + scoring |
 | `date` | no | today (local) | `YYYY-MM-DD` filter |
 | `sources` | no | auto-pick | `[{"name": "aibase"}]` |
-| `outputFile` | no | `./daily/docs/daily-report-YYYY-MM-DD.md` | final path |
+| `outputFile` | no | `./daily/docs/daily-report-YYYY-MM-DD.{md|html}` | final path |
 
 ## Core Workflow
 
-1. **Discover sources**: `node skills/professional-daily-report/scripts/list-sources.js`
-2. **Create `./tmp/report-plan.json`** from the user's request
-3. **Fetch**: `node skills/professional-daily-report/scripts/fetch-articles.js`
-4. **Select**: `node skills/professional-daily-report/scripts/dedup-articles.js`
-5. **Write `./tmp/report-content.md`** following the template
-6. **Finalize**: `node skills/professional-daily-report/scripts/finalize-report.js`
+1. **Choose format**: ask whether to output Markdown or HTML 大字报
+2. **Discover sources**: `node skills/professional-daily-report/scripts/list-sources.js`
+3. **Create `./tmp/report-plan.json`** from the user's request
+4. **Fetch**: `node skills/professional-daily-report/scripts/fetch-articles.js`
+5. **Select**: `node skills/professional-daily-report/scripts/dedup-articles.js`
+6. **Write `./tmp/report-content.md`** following the template
+7. **Finalize**: `node skills/professional-daily-report/scripts/finalize-report.js`
 
-After finalize, the report is written to `./daily/docs/daily-report-YYYY-MM-DD.md` and `./tmp` is deleted. Helper scripts auto-install `news-cli` if `news` is missing (repo build first, then global install).
+After finalize, the report is written to `./daily/docs/daily-report-YYYY-MM-DD.{md,html}` and `./tmp` is deleted. Helper scripts auto-install `news-cli` if `news` is missing (repo build first, then global install).
 
 ## Step 0: Discover Sources
 
@@ -88,9 +99,24 @@ Read `./tmp/selected-articles.json` and write `./tmp/report-content.md`.
 5. **Match the requested `style`** in tone.
 6. **Output only the report Markdown** to `./tmp/report-content.md`; no code fences, no explanations.
 
+### HTML Branch
+
+If `report-plan.json.format === "html"`, write `./tmp/report-content.html` instead of `./tmp/report-content.md`.
+
+**Template file (MUST follow):** `skills/professional-daily-report/reference/daily-report-template.html`
+
+**Rules:**
+1. Replace every `<<::identifier description>>` placeholder with real content and remove the markers.
+2. Output a complete, self-contained HTML file with embedded CSS.
+3. Article titles must be clickable bold `<a>` links to the original URL.
+4. Insight sentences must be wrapped in `<strong>` so they stand out from the summary.
+5. Use the A1 aged-newspaper style: paper texture, serif fonts, double-rule masthead, first-letter drop cap.
+6. Do not fabricate facts beyond article title/snippet.
+7. Match the requested `style` in tone.
+
 ## Step 5: Finalize
 
-Run `finalize-report.js`. It appends a generation footer, writes the final file to `./daily/docs/daily-report-YYYY-MM-DD.md` (or `outputFile` if specified), and deletes `./tmp`.
+Run `finalize-report.js`. It reads `./tmp/report-content.{md,html}` according to `report-plan.json.format`, writes the final file to `./daily/docs/daily-report-YYYY-MM-DD.{md,html}` (or `outputFile`), and deletes `./tmp`.
 
 ## Failure Handling
 
@@ -102,6 +128,8 @@ Run `finalize-report.js`. It appends a generation footer, writes the final file 
 ## Common Mistakes
 
 - Leaving `<<::...>>` placeholders in the final Markdown
+- Leaving `<<::...>>` placeholders in the final HTML
+- Forgetting to set `format: "html"` in the plan when generating HTML
 - Skipping the today-only filter and including older articles
 - Inventing facts not supported by the title/snippet
 - Adding sections not present in the template
