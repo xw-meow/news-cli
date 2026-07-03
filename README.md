@@ -207,6 +207,7 @@ src/
 test/                     # vitest 测试用例
 scripts/build.js          # esbuild 构建脚本
 site/                     # 项目官网（Vite + React + Tailwind）
+skills/                   # OpenCode AI skills
 ```
 
 ### 2.3 如何新增一个新闻源
@@ -288,13 +289,13 @@ npm run dev
 npm test
 ```
 
-### 2.6 AI Skill：专业日报编写
+### 2.6 AI Skill：professional-daily-report
 
 项目内置了一个 OpenCode Skill，用于自动生成博客 / Newsletter 风格的 Markdown 日报。
 
-位置：`skills/专业日报编写/`
+位置：`skills/professional-daily-report/`
 
-用法：
+用法示例：
 
 ```text
 帮我写一份今天的 AI 行业日报，面向 AI 从业者，正式风格，10 条左右，保存到 docs/ai-daily.md
@@ -307,7 +308,7 @@ npm test
 4. 去重、筛选、排序。
 5. 生成带导语、分栏、观点、来源统计的 Markdown 日报。
 
-详见 `skills/专业日报编写/SKILL.md`。
+详见 `skills/professional-daily-report/SKILL.md`。
 
 ---
 
