@@ -78,7 +78,11 @@ Read `./tmp/selected-articles.json` and write `./tmp/report-content.md`.
 **Compliance rules:**
 
 1. **Follow the template structure exactly.** Do not add, remove, rename, or reorder sections.
-2. **Repeat the article group pattern** for each selected article: `### 标题`, summary paragraph, insight sentence, `[原文链接](URL)`. Group related articles under the same `## 分组标题`; start a new section when the theme changes.
+2. **Repeat the article group pattern** for each selected article:
+   - Heading: `### [<标题>](<URL>)` — title is a clickable link to the original article
+   - Summary paragraph
+   - Insight sentence wrapped in `**粗体**` so it visually differs from the summary
+   Group related articles under the same `## 分组标题`; start a new section when the theme changes.
 3. **Keep exact Markdown formatting** for the title line, `## 导语`, and `## 今日来源`.
 4. **Do not fabricate facts** beyond the article title/snippet.
 5. **Match the requested `style`** in tone.
