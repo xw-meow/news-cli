@@ -104,26 +104,33 @@ describe('runSequentially', () => {
   it('按正确顺序调用各阶段并返回最终输出路径', async () => {
     const result = await runSequentially(request);
 
-    expect(parseRequest).toHaveBeenCalledExactlyOnceWith(request);
-    expect(writePlan).toHaveBeenCalledExactlyOnceWith(plan);
+    expect(parseRequest).toHaveBeenCalledOnce();
+    expect(parseRequest).toHaveBeenCalledWith(request);
+    expect(writePlan).toHaveBeenCalledOnce();
+    expect(writePlan).toHaveBeenCalledWith(plan);
 
     expect(fetchSourceToFile).toHaveBeenCalledTimes(plan.sources.length);
     for (const source of plan.sources) {
       expect(fetchSourceToFile).toHaveBeenCalledWith(source);
     }
 
-    expect(selectArticles).toHaveBeenCalledExactlyOnceWith(
+    expect(selectArticles).toHaveBeenCalledOnce();
+    expect(selectArticles).toHaveBeenCalledWith(
       [],
       { targetCount: plan.targetCount, keywords: plan.keywords },
     );
-    expect(writeSelected).toHaveBeenCalledExactlyOnceWith(
+    expect(writeSelected).toHaveBeenCalledOnce();
+    expect(writeSelected).toHaveBeenCalledWith(
       expect.objectContaining({ plan, articles: selectedArticles }),
     );
-    expect(generateReport).toHaveBeenCalledExactlyOnceWith(
+    expect(generateReport).toHaveBeenCalledOnce();
+    expect(generateReport).toHaveBeenCalledWith(
       expect.objectContaining({ plan, articles: selectedArticles }),
     );
-    expect(writeReport).toHaveBeenCalledExactlyOnceWith(reportContent);
-    expect(finalizeReport).toHaveBeenCalledExactlyOnceWith(reportContent, plan.outputFile);
+    expect(writeReport).toHaveBeenCalledOnce();
+    expect(writeReport).toHaveBeenCalledWith(reportContent);
+    expect(finalizeReport).toHaveBeenCalledOnce();
+    expect(finalizeReport).toHaveBeenCalledWith(reportContent, plan.outputFile);
     expect(result).toBe(plan.outputFile);
   });
 
