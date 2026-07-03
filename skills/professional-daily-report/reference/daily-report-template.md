@@ -1,18 +1,18 @@
-# <<::topic 日报主题>> · <<::date YYYY-MM-DD>>
+# <<::topic 日报主题>> · <<::date 日期，格式 YYYY-MM-DD>>
 
-> 读者：<<::audience 目标读者>> | 风格：<<::style 风格描述>> | 共 <<::articleCount 文章数量>> 条
+> 读者：<<::audience 目标读者>> | 风格：<<::style 风格描述>> | 共 <<::articleCount 入选文章数量>> 条
 
 ## 导语
 
-<<::lead 用2-3句话概括今日最核心的趋势、事件或变化，不展开具体文章>>
+<<::lead 用 2-3 句话概括今日最核心的趋势、事件或变化，不展开具体文章>>
 
-## <<::sectionTitle 分组标题，按主题聚合相关文章，如“大模型动态”>>
+## <<::sectionTitle 分组标题，按主题聚合相关文章，例如“大模型动态”>>
 
 ### <<::articleTitle 文章标题>>
 
-<<::articleSummary 用2-3句话准确概括文章内容，基于标题和摘要，不编造超出范围的事实>>
+<<::articleSummary 用 2-3 句话准确概括文章内容，仅基于标题和摘要，不编造超出范围的事实>>
 
-<<::articleInsight 用1句话给出洞察、影响或读者应该关注的关键点>>
+<<::articleInsight 用 1 句话给出洞察、影响或读者应关注的关键点>>
 
 [原文链接](<<::articleUrl 文章URL>>)
 
@@ -24,4 +24,4 @@
 
 ---
 
-**Template compliance:** Replace every `<<::identifier description>>` with real content. Remove all `<<::` and `>>` markers. Repeat the `## 分组标题` → `### 标题` → summary → insight → link block for every selected article. Do not add, remove, or reorder sections.
+**模板使用规则：** 将每一个 `<<::标识符 描述>>` 替换为真实内容，并删除所有 `<<::` 和 `>>` 标记。对每个入选文章重复以下结构：`## 分组标题` → `### 文章标题` → 摘要 → 洞察 → 原文链接。不要增加、删除或调整章节顺序。
