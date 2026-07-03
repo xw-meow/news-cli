@@ -6,3 +6,8 @@ site/node_modules
 site/dist
 site/tsconfig.tsbuildinfo
 .DS_Store
+
+# Skill artifacts
+skills/**/node_modules
+skills/**/dist
+skills/**/tmp
