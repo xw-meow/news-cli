@@ -35,6 +35,7 @@ export async function runSequentially(request: string): Promise<string> {
   writePlan(plan);
 
   for (const source of plan.sources) {
+    // fetchSourceToFile 是同步函数，直接调用即可
     fetchSourceToFile(source);
   }
 
