@@ -38,6 +38,9 @@ describe('generateReport', () => {
     expect(md).toContain('OpenAI 发布 GPT-5');
     expect(md).toContain('[原文链接](https://openai.com)');
     expect(md).toContain('## 今日来源');
+    expect(md).toContain('> 该消息来自 36kr · AI，与 AI 日报 主题相关。');
+    expect(md).not.toContain('r1');
+    expect(md).not.toContain('r2');
   });
 });
 

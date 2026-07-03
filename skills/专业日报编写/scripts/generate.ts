@@ -1,9 +1,6 @@
-import { writeFileSync, mkdirSync, readFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { writeFileSync, mkdirSync } from 'fs';
+import { dirname } from 'path';
 import type { SelectedArticles } from './dedup.js';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export function todayStr(): string {
   const d = new Date();
@@ -23,8 +20,9 @@ function groupBy<T>(items: T[], keyFn: (item: T) => string): Record<string, T[]>
   }, {} as Record<string, T[]>);
 }
 
-function renderArticle(a: SelectedArticles['articles'][number]): string {
-  return `### ${a.title}\n\n${a.snippet || '暂无摘要'}\n\n${a.selectedReason || '与主题相关'}\n\n[原文链接](${a.url})\n`;
+function renderArticle(a: SelectedArticles['articles'][number], topic: string): string {
+  const category = a.category ? ` · ${a.category}` : '';
+  return `### ${a.title}\n\n${a.snippet || '暂无摘要'}\n\n> 该消息来自 ${a.source}${category}，与 ${topic} 主题相关。\n\n[原文链接](${a.url})\n`;
 }
 
 export function generateReport(data: SelectedArticles): string {
@@ -44,7 +42,7 @@ export function generateReport(data: SelectedArticles): string {
     lines.push(`## ${source}`);
     lines.push('');
     for (const a of list) {
-      lines.push(renderArticle(a));
+      lines.push(renderArticle(a, plan.topic));
     }
   }
 
@@ -65,13 +63,4 @@ export function generateReport(data: SelectedArticles): string {
 export function writeReport(content: string, path = './tmp/report-content.md'): void {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, content, 'utf8');
-}
-
-export function loadTemplate(name = 'newsletter'): string {
-  const templatePath = join(__dirname, '..', 'templates', `${name}.md`);
-  try {
-    return readFileSync(templatePath, 'utf8');
-  } catch {
-    return '';
-  }
 }

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { execFileSync } from 'child_process';
-import { mkdtempSync, rmSync, mkdirSync } from 'fs';
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { runSequentially } from '../scripts/orchestrate.js';
+import { runSequentially, loadRawArticles } from '../scripts/orchestrate.js';
 
 vi.mock('child_process', async (importOriginal) => {
   const mod = await importOriginal<typeof import('child_process')>();
@@ -144,5 +144,50 @@ describe('runSequentially', () => {
     await expect(runSequentially(request)).rejects.toThrow(
       'news 命令不可用，请先执行 npm run build && npm link',
     );
+  });
+});
+
+describe('loadRawArticles', () => {
+  let tmpDir: string;
+  let originalCwd: string;
+
+  beforeEach(() => {
+    originalCwd = process.cwd();
+    tmpDir = mkdtempSync(join(tmpdir(), 'loadraw-test-'));
+    process.chdir(tmpDir);
+    mkdirSync('./tmp', { recursive: true });
+  });
+
+  afterEach(() => {
+    process.chdir(originalCwd);
+    rmSync(tmpDir, { recursive: true, force: true });
+    vi.clearAllMocks();
+  });
+
+  it('跳过损坏的 raw 文件并记录错误', () => {
+    writeFileSync(
+      './tmp/raw-valid.json',
+      JSON.stringify([
+        {
+          id: '1',
+          title: 'Valid',
+          url: 'https://example.com/1',
+          source: 'aibase',
+          snippet: 'snippet',
+          publishedAt: null,
+          category: null,
+          imageUrl: null,
+        },
+      ]),
+      'utf8',
+    );
+    writeFileSync('./tmp/raw-broken.json', 'not json', 'utf8');
+
+    const articles = loadRawArticles();
+
+    expect(articles).toHaveLength(1);
+    expect(articles[0].title).toBe('Valid');
+    const log = readFileSync('./tmp/fetch-errors.log', 'utf8');
+    expect(log).toContain('raw-broken.json');
   });
 });

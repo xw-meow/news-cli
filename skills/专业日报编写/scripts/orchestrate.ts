@@ -4,7 +4,7 @@ import { fetchSourceToFile } from './fetch.js';
 import { selectArticles, writeSelected, type SelectedArticles } from './dedup.js';
 import { generateReport, writeReport } from './generate.js';
 import { finalizeReport } from './finalize.js';
-import { readFileSync, readdirSync, appendFileSync, mkdirSync, rmSync } from 'fs';
+import { readFileSync, readdirSync, appendFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import type { NewsArticle } from './fetch.js';
 
 export function checkNewsAvailable(): boolean {
@@ -20,8 +20,14 @@ export function loadRawArticles(tmpDir = './tmp'): NewsArticle[] {
   const files = readdirSync(tmpDir).filter(f => f.startsWith('raw-') && f.endsWith('.json'));
   const articles: NewsArticle[] = [];
   for (const file of files) {
-    const data = JSON.parse(readFileSync(`${tmpDir}/${file}`, 'utf8')) as NewsArticle[];
-    articles.push(...data);
+    try {
+      const data = JSON.parse(readFileSync(`${tmpDir}/${file}`, 'utf8')) as NewsArticle[];
+      articles.push(...data);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[warning] 跳过损坏文件 "${file}": ${message}`);
+      logFetchError(file, message);
+    }
   }
   return articles;
 }
@@ -39,6 +45,11 @@ function cleanRawFiles(tmpDir = './tmp'): void {
   }
 }
 
+function clearFetchErrors(tmpDir = './tmp'): void {
+  ensureTmpDir(tmpDir);
+  writeFileSync(`${tmpDir}/fetch-errors.log`, '', 'utf8');
+}
+
 function logFetchError(sourceName: string, message: string, tmpDir = './tmp'): void {
   ensureTmpDir(tmpDir);
   const timestamp = new Date().toISOString();
@@ -54,6 +65,7 @@ export async function runSequentially(request: string): Promise<string> {
   writePlan(plan);
 
   cleanRawFiles();
+  clearFetchErrors();
 
   for (const source of plan.sources) {
     try {
