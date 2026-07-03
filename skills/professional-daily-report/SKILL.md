@@ -43,7 +43,7 @@ Helper scripts auto-install `news-cli` if `news` is missing (repo build first, t
 
 ## Step 0: Discover Sources
 
-Run `list-sources.js`. It writes `./tmp/available-sources.json` with `available` and `recommended` arrays. Pick 2–5 complementary sources from `recommended`; fall back to `available` if the topic is unusual. Use each source's default category by setting `category: null`.
+Run `list-sources.js`. It writes `./tmp/available-sources.json` with `available` and `recommended` arrays. Pick exactly 5 complementary sources from `recommended`; fall back to `available` if the topic is unusual. Use each source's default category by setting `category: null`.
 
 ## Step 1: Create `report-plan.json`
 
