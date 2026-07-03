@@ -305,7 +305,19 @@ npm test
 
 位置：`skills/professional-daily-report/`
 
-用法示例：
+#### 安装 Skill
+
+如果你在使用 OpenCode，直接让 AI 执行以下命令下载并安装 skill：
+
+```bash
+curl -LO https://raw.githubusercontent.com/xw-meow/news-cli/main/skills/professional-daily-report.zip
+```
+
+AI 会自动将下载的 zip 安装到对应的 skill 目录，安装完成后即可使用。
+
+> 维护者可用 `npm run packskills` 重新打包所有 skill。
+
+#### 使用示例
 
 ```text
 帮我写一份今天的 AI 行业日报，面向 AI 从业者，正式风格，10 条左右，保存到 docs/ai-daily.md
@@ -315,7 +327,8 @@ npm test
 帮我生成一份今天的 AI 行业 HTML 大字报，旧报纸风格
 ```
 
-它会自动：
+#### 它会自动做什么
+
 1. 询问输出格式（Markdown 或 HTML 大字报）。
 2. 解析主题、读者、风格、篇幅、输出文件。
 3. 按主题推荐新闻源。

@@ -178,7 +178,7 @@ If you want to modify code, add a news source, or write plugins, read this secti
 ```bash
 npm run dev          # tsx hot run
 npm run build        # esbuild bundle → dist/index.js
-npm test             # vitest (398 tests, 40 files)
+npm test             # vitest (407 tests, 41 files)
 npm run test:watch   # vitest watch mode
 npm run lint         # ESLint
 npm run lint:fix     # ESLint auto-fix
@@ -208,6 +208,17 @@ src/
 test/                     # vitest test cases
 scripts/build.js          # esbuild build script
 site/                     # project website (Vite + React + Tailwind)
+skills/                   # OpenCode AI skills
+├── professional-daily-report/  # Markdown / HTML poster daily report
+│   ├── SKILL.md
+│   ├── reference/
+│   │   ├── daily-report-template.md
+│   │   └── daily-report-template.html
+│   └── scripts/
+│       ├── list-sources.js
+│       ├── fetch-articles.js
+│       ├── dedup-articles.js
+│       └── finalize-report.js
 ```
 
 ### 2.3 Adding a New Source
@@ -288,6 +299,45 @@ npm install
 npm run dev
 npm test
 ```
+
+### 2.6 AI Skill: professional-daily-report
+
+This project ships with an OpenCode Skill that automatically generates blog / newsletter-style daily reports in either **Markdown** or **HTML poster** format.
+
+Location: `skills/professional-daily-report/`
+
+#### Install the Skill
+
+If you are using OpenCode, ask your AI to run:
+
+```bash
+curl -LO https://raw.githubusercontent.com/xw-meow/news-cli/main/skills/professional-daily-report.zip
+```
+
+The AI will install the downloaded zip into the appropriate skill directory, and you can start using it right away.
+
+> Maintainers can repack all skills with `npm run packskills`.
+
+#### Usage Examples
+
+```text
+Write an AI industry daily report for today, targeting AI practitioners, formal tone, around 10 items, save to docs/ai-daily.md
+```
+
+```text
+Generate an HTML poster-style daily report for today's AI industry, old-newspaper look
+```
+
+#### What It Does Automatically
+
+1. Asks for the output format (Markdown or HTML poster).
+2. Parses topic, audience, tone, length, and output file.
+3. Recommends news sources based on the topic.
+4. Fetches articles in parallel via `news get --json`.
+5. Deduplicates, filters, and sorts.
+6. Generates a Markdown report with intro, sections, opinions, and source stats, or a self-contained HTML poster with paper texture and newspaper front-page style.
+
+See `skills/professional-daily-report/SKILL.md` for details. Default output is `./daily/docs/daily-report-YYYY-MM-DD.{md,html}`.
 
 ---
 
