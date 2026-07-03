@@ -16,6 +16,12 @@
 
 [原文链接](<<::articleUrl 文章URL>>)
 
+---
+
 ## 今日来源
 
 - <<::sourceName 来源名称>>: <<::sourceCount 该来源入选文章数>> 条
+
+---
+
+**Template compliance:** Replace every `<<::identifier description>>` with real content. Remove all `<<::` and `>>` markers. Repeat the `## 分组标题` → `### 标题` → summary → insight → link block for every selected article. Do not add, remove, or reorder sections.
