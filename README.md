@@ -190,15 +190,6 @@ curl -LO https://raw.githubusercontent.com/xw-meow/news-cli/main/skills/professi
 帮我生成一份今天的 AI 行业 HTML 大字报，旧报纸风格
 ```
 
-#### AI 会自动做什么
-
-1. 询问输出格式（Markdown 或 HTML 大字报）。
-2. 解析主题、读者、风格、篇幅、输出文件。
-3. 按主题推荐新闻源。
-4. 调用 `news get --json` 并行抓取。
-5. 去重、筛选、排序。
-6. 生成带导语、分栏、观点、来源统计的 Markdown 日报，或自包含的 HTML 大字报。
-
 详见 `skills/professional-daily-report/SKILL.md`。默认输出到 `./daily/docs/daily-report-YYYY-MM-DD.{md,html}`。
 
 ---

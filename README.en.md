@@ -191,15 +191,6 @@ Write an AI industry daily report for today, targeting AI practitioners, formal 
 Generate an HTML poster-style daily report for today's AI industry, old-newspaper look
 ```
 
-#### What the AI Does Automatically
-
-1. Asks for the output format (Markdown or HTML poster).
-2. Parses topic, audience, tone, length, and output file.
-3. Recommends news sources based on the topic.
-4. Fetches articles in parallel via `news get --json`.
-5. Deduplicates, filters, and sorts.
-6. Generates a Markdown report with intro, sections, opinions, and source stats, or a self-contained HTML poster.
-
 See `skills/professional-daily-report/SKILL.md` for details. Default output is `./daily/docs/daily-report-YYYY-MM-DD.{md,html}`.
 
 ---
