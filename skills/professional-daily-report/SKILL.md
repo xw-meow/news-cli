@@ -23,7 +23,6 @@ Generate a polished Markdown daily report / newsletter from `news get --json` ou
 | Field | Required | Default | Maps to |
 |---|---|---|---|
 | `topic` | yes | — | report title |
-| `audience` | no | 对该主题感兴趣的读者 | meta line |
 | `style` | no | 平衡 | tone (正式 / 轻松 / 深度 / 短讯) |
 | `length` | no | 中 | `targetCount`: 短=5–7, 中=8–12, 长=13–20 |
 | `keywords` | no | [] | filter + scoring |
@@ -51,7 +50,6 @@ Run `list-sources.js`. It writes `./tmp/available-sources.json` with `available`
 ```json
 {
   "topic": "AI 行业早报",
-  "audience": "AI 从业者",
   "style": "正式",
   "length": "中",
   "keywords": ["大模型", "OpenAI"],
@@ -81,7 +79,7 @@ Read `./tmp/selected-articles.json` and write `./tmp/report-content.md`.
 
 1. **Follow the template structure exactly.** Do not add, remove, rename, or reorder sections.
 2. **Repeat the article group pattern** for each selected article: `### 标题`, summary paragraph, insight sentence, `[原文链接](URL)`. Group related articles under the same `## 分组标题`; start a new section when the theme changes.
-3. **Keep exact Markdown formatting** for the title line, meta line, `## 导语`, and `## 今日来源`.
+3. **Keep exact Markdown formatting** for the title line, `## 导语`, and `## 今日来源`.
 4. **Do not fabricate facts** beyond the article title/snippet.
 5. **Match the requested `style`** in tone.
 6. **Output only the report Markdown** to `./tmp/report-content.md`; no code fences, no explanations.
