@@ -114,40 +114,30 @@ This merges all `raw-*.json`, deduplicates by URL and title similarity (≥ 85%)
 
 ## Step 4: Write the Report Body
 
-Read `./tmp/selected-articles.json` and write `./tmp/report-content.md` yourself. Use this structure:
+Read `./tmp/selected-articles.json` and write `./tmp/report-content.md` yourself.
 
-```markdown
-# {topic} · {YYYY-MM-DD}
+**Template file (MUST follow):** `skills/professional-daily-report/reference/daily-report-template.md`
 
-> 读者：{audience} | 风格：{style} | 共 {N} 条
+### Template Compliance Rules
 
-## 导语
-
-{2–3 sentences summarizing the main trend}
-
-## {Section Title}
-
-### {Article Title}
-
-{2–3 sentence summary}
-
-{1 sentence insight / takeaway}
-
-[原文链接]({url})
-
-...
-
-## 今日来源
-
-- {source}: {count} 条
-- ...
-```
-
-Guidelines:
-- Group related articles under section headings
-- Each entry: summary + insight + source link
-- Tone matches the requested `style`
-- Do not fabricate facts beyond the article title/snippet
+1. **Strictly follow the template structure.** Do not add, remove, or rename sections, and do not reorder them.
+2. **Replace every placeholder** of the form `<<::placeholderIdentifier description>>` with real content.
+   - Remove the placeholder syntax completely; do not keep `<<::...>>` in the output.
+   - Use the description inside the placeholder as a hint for what belongs there.
+3. **Repeat the article group pattern as needed.** For each selected article, produce:
+   - one `### 标题` line,
+   - one summary paragraph,
+   - one insight sentence,
+   - one `[原文链接](URL)` line.
+   Use the same `## 分组标题` for articles that belong to the same theme; create new `## 分组标题` sections when the theme changes.
+4. **Keep the exact Markdown formatting:**
+   - `# {topic} · {YYYY-MM-DD}` for the title
+   - `> 读者：... | 风格：... | 共 ... 条` for the meta line
+   - `## 导语` with a 2–3 sentence lead paragraph
+   - `## 今日来源` with `- {source}: {count} 条` bullets
+5. **Do not fabricate facts beyond the article title/snippet.**
+6. **Match the requested `style`** in tone and phrasing.
+7. **Output only the report Markdown** to `./tmp/report-content.md`; do not wrap it in code fences or add explanations.
 
 ## Step 5: Finalize
 
