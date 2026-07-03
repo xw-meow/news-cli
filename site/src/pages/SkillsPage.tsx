@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { TerminalBlock } from '../components/ui/TerminalBlock';
 import { GlowCard } from '../components/ui/GlowCard';
-import { SparklesIcon, NewspaperIcon, CheckIcon } from '../components/ui/Icon';
+import { SparklesIcon, NewspaperIcon, CheckIcon, CopyIcon } from '../components/ui/Icon';
 import { useI18n } from '../i18n/I18nProvider';
 
 const INSTALL_COMMAND =
@@ -58,11 +58,11 @@ export function SkillsPage() {
               <TerminalBlock lines={[`$ ${INSTALL_COMMAND}`]} breakAll />
               <button
                 onClick={handleCopy}
-                className="absolute top-3 right-3 p-1.5 rounded-md bg-gray-800/80 border border-gray-700 text-gray-400 hover:text-green-400 hover:border-green-400/40 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                className="absolute top-2.5 right-2.5 p-1.5 rounded text-gray-500 hover:text-green-400 hover:bg-white/5 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                 aria-label="Copy command"
                 title="Copy"
               >
-                {copied ? <CheckIcon size={14} className="text-green-400" /> : <span className="text-xs">Copy</span>}
+                {copied ? <CheckIcon size={16} className="text-green-400" /> : <CopyIcon size={16} />}
               </button>
             </div>
           </div>
