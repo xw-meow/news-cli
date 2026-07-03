@@ -118,4 +118,11 @@ describe('selectArticles', () => {
     expect(result[0].selectedReason).toContain('来源权重3');
     expect(result[0].selectedReason).toContain('命中1个关键词');
   });
+
+  it('注入固定 now 后选中理由完全确定', () => {
+    const now = Date.parse('2026-07-03T12:00:00Z');
+    const arts = [article({ source: 'aibase', title: 'AI 新闻', snippet: '人工智能', publishedAt: '2026-07-03T10:00:00Z' })];
+    const result = selectArticles(arts, { targetCount: 1, keywords: ['AI'] }, now);
+    expect(result[0].selectedReason).toBe('来源权重3，时效分0.99，命中1个关键词');
+  });
 });

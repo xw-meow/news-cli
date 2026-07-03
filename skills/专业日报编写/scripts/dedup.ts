@@ -133,14 +133,15 @@ function buildReason(s: ScoreBreakdown): string {
 
 export function selectArticles(
   articles: NewsArticle[],
-  opts: { targetCount: number; keywords: string[] }
+  opts: { targetCount: number; keywords: string[] },
+  now = Date.now()
 ): SelectedArticle[] {
   let list = filterByKeywords(articles, opts.keywords);
   list = deduplicate(list);
-  list.sort((a, b) => scoreArticle(b, opts.keywords) - scoreArticle(a, opts.keywords));
+  list.sort((a, b) => scoreArticle(b, opts.keywords, now) - scoreArticle(a, opts.keywords, now));
   const selected = list.slice(0, opts.targetCount);
   return selected.map(a => {
-    const s = scoreArticleDetailed(a, opts.keywords, Date.now());
+    const s = scoreArticleDetailed(a, opts.keywords, now);
     return {
       ...a,
       selectedReason: buildReason(s),
