@@ -166,6 +166,41 @@ news get hackernews -c top -l 5
 
 </details>
 
+### 1.6 日报 Skill：professional-daily-report
+
+除了直接查新闻，还可以让 AI 用这个项目的 Skill 帮你自动生成日报，输出 **Markdown** 或 **HTML 大字报**。
+
+#### 安装 Skill
+
+如果你在使用 OpenCode，让 AI 执行下面命令下载并安装：
+
+```bash
+curl -LO https://raw.githubusercontent.com/xw-meow/news-cli/main/skills/professional-daily-report.zip
+```
+
+安装完成后，直接对 AI 说出你的日报需求即可。
+
+#### 使用示例
+
+```text
+帮我写一份今天的 AI 行业日报，面向 AI 从业者，正式风格，10 条左右，保存到 docs/ai-daily.md
+```
+
+```text
+帮我生成一份今天的 AI 行业 HTML 大字报，旧报纸风格
+```
+
+#### AI 会自动做什么
+
+1. 询问输出格式（Markdown 或 HTML 大字报）。
+2. 解析主题、读者、风格、篇幅、输出文件。
+3. 按主题推荐新闻源。
+4. 调用 `news get --json` 并行抓取。
+5. 去重、筛选、排序。
+6. 生成带导语、分栏、观点、来源统计的 Markdown 日报，或自包含的 HTML 大字报。
+
+详见 `skills/professional-daily-report/SKILL.md`。默认输出到 `./daily/docs/daily-report-YYYY-MM-DD.{md,html}`。
+
 ---
 
 ## 二、开发者指南
@@ -298,45 +333,6 @@ npm install
 npm run dev
 npm test
 ```
-
-### 2.6 AI Skill：professional-daily-report
-
-项目内置了一个 OpenCode Skill，用于自动生成博客 / Newsletter 风格的日报，支持 **Markdown** 或 **HTML 大字报** 两种输出格式。
-
-位置：`skills/professional-daily-report/`
-
-#### 安装 Skill
-
-如果你在使用 OpenCode，直接让 AI 执行以下命令下载并安装 skill：
-
-```bash
-curl -LO https://raw.githubusercontent.com/xw-meow/news-cli/main/skills/professional-daily-report.zip
-```
-
-AI 会自动将下载的 zip 安装到对应的 skill 目录，安装完成后即可使用。
-
-> 维护者可用 `npm run packskills` 重新打包所有 skill。
-
-#### 使用示例
-
-```text
-帮我写一份今天的 AI 行业日报，面向 AI 从业者，正式风格，10 条左右，保存到 docs/ai-daily.md
-```
-
-```text
-帮我生成一份今天的 AI 行业 HTML 大字报，旧报纸风格
-```
-
-#### 它会自动做什么
-
-1. 询问输出格式（Markdown 或 HTML 大字报）。
-2. 解析主题、读者、风格、篇幅、输出文件。
-3. 按主题推荐新闻源。
-4. 调用 `news get --json` 并行抓取。
-5. 去重、筛选、排序。
-6. 生成带导语、分栏、观点、来源统计的 Markdown 日报，或自包含的 HTML 大字报（纸质感、报纸头版风格）。
-
-详见 `skills/professional-daily-report/SKILL.md`。默认输出到 `./daily/docs/daily-report-YYYY-MM-DD.{md,html}`。
 
 ---
 
