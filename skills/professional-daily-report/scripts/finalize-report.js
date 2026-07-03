@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 // skills/professional-daily-report/scripts/finalize-report.js
 // Reads ./tmp/report-content.md + ./tmp/selected-articles.json,
-// appends a generation footer, then writes the final file named in report-plan.json.
+// appends a generation footer, writes the final file named in report-plan.json,
+// then cleans up ./tmp.
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 
 const TMP_DIR = './tmp';
+const DEFAULT_OUTPUT_DIR = './daily/docs';
 const PLAN_FILE = join(TMP_DIR, 'report-plan.json');
 const CONTENT_FILE = join(TMP_DIR, 'report-content.md');
 const SELECTED_FILE = join(TMP_DIR, 'selected-articles.json');
@@ -26,15 +28,6 @@ function readContent() {
   return readFileSync(CONTENT_FILE, 'utf8');
 }
 
-function countBySource(articles) {
-  const counts = {};
-  for (const art of articles) {
-    const s = art.source || 'unknown';
-    counts[s] = (counts[s] || 0) + 1;
-  }
-  return counts;
-}
-
 function formatDate(date) {
   const d = new Date(date);
   const pad = (n) => String(n).padStart(2, '0');
@@ -49,12 +42,18 @@ function formatDateTime(date) {
   )}:${pad(d.getMinutes())}`;
 }
 
-function buildSourceStats(articles) {
-  const counts = countBySource(articles);
-  const lines = Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([source, count]) => `- ${source}: ${count} 条`);
-  return lines.join('\n');
+function resolveOutputFile(plan) {
+  if (plan.outputFile) return plan.outputFile;
+
+  const dateStr = plan.date || formatDate(new Date());
+  return join(DEFAULT_OUTPUT_DIR, `daily-report-${dateStr}.md`);
+}
+
+function cleanTmp() {
+  if (existsSync(TMP_DIR)) {
+    rmSync(TMP_DIR, { recursive: true, force: true });
+    console.error(`[finalize] cleaned ${TMP_DIR}`);
+  }
 }
 
 function main() {
@@ -62,11 +61,10 @@ function main() {
   const { articles } = readSelected();
   const body = readContent();
 
-  const outputFile = plan.outputFile || `./daily-report-${formatDate(new Date())}.md`;
+  const outputFile = resolveOutputFile(plan);
   const parentDir = dirname(outputFile);
   if (parentDir && !existsSync(parentDir)) mkdirSync(parentDir, { recursive: true });
 
-  const sourceStats = buildSourceStats(articles);
   const footer = `
 
 ---
@@ -77,6 +75,8 @@ function main() {
   const finalContent = body + footer;
   writeFileSync(outputFile, finalContent, 'utf8');
   console.error(`[finalize] wrote ${outputFile} (${articles.length} articles)`);
+
+  cleanTmp();
 }
 
 main();

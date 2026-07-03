@@ -28,7 +28,7 @@ Generate a polished Markdown daily report / newsletter from `news get --json` ou
 | `keywords` | no | [] | filter + scoring |
 | `date` | no | today (local) | `YYYY-MM-DD` filter |
 | `sources` | no | auto-pick | `[{"name": "aibase"}]` |
-| `outputFile` | no | `./daily-report-YYYY-MM-DD.md` | final path |
+| `outputFile` | no | `./daily/docs/daily-report-YYYY-MM-DD.md` | final path |
 
 ## Core Workflow
 
@@ -39,7 +39,7 @@ Generate a polished Markdown daily report / newsletter from `news get --json` ou
 5. **Write `./tmp/report-content.md`** following the template
 6. **Finalize**: `node skills/professional-daily-report/scripts/finalize-report.js`
 
-Helper scripts auto-install `news-cli` if `news` is missing (repo build first, then global install).
+After finalize, the report is written to `./daily/docs/daily-report-YYYY-MM-DD.md` and `./tmp` is deleted. Helper scripts auto-install `news-cli` if `news` is missing (repo build first, then global install).
 
 ## Step 0: Discover Sources
 
@@ -90,7 +90,7 @@ Read `./tmp/selected-articles.json` and write `./tmp/report-content.md`.
 
 ## Step 5: Finalize
 
-Run `finalize-report.js`. It prepends YAML metadata, appends a generation footer, and writes to `outputFile`.
+Run `finalize-report.js`. It appends a generation footer, writes the final file to `./daily/docs/daily-report-YYYY-MM-DD.md` (or `outputFile` if specified), and deletes `./tmp`.
 
 ## Failure Handling
 
