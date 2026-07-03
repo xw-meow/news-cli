@@ -5,15 +5,15 @@ import { NewsCliError } from './core/types.js';
 import { error as logError } from './utils/logger.js';
 import { registerPluginCommands } from './plugin/cli.js';
 
+// 当 stdout 被提前关闭时（如 pipe 到 head），静默退出而不是抛未处理的 EPIPE
+process.stdout.on('error', (err) => {
+  if ((err as NodeJS.ErrnoException).code === 'EPIPE') {
+    process.exit(0);
+  }
+});
+
 export function createCLI(): Command {
   const program = new Command();
-
-  // 当 stdout 被提前关闭时（如 pipe 到 head），静默退出而不是抛未处理的 EPIPE
-  process.stdout.on('error', (err) => {
-    if ((err as NodeJS.ErrnoException).code === 'EPIPE') {
-      process.exit(0);
-    }
-  });
 
   program
     .name('news')

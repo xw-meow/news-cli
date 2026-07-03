@@ -4,7 +4,7 @@ import { fetchSourceToFile } from './fetch.js';
 import { selectArticles, writeSelected, type SelectedArticles } from './dedup.js';
 import { generateReport, writeReport } from './generate.js';
 import { finalizeReport } from './finalize.js';
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync, readdirSync, appendFileSync, mkdirSync, rmSync } from 'fs';
 import type { NewsArticle } from './fetch.js';
 
 export function checkNewsAvailable(): boolean {
@@ -26,6 +26,25 @@ export function loadRawArticles(tmpDir = './tmp'): NewsArticle[] {
   return articles;
 }
 
+function ensureTmpDir(tmpDir = './tmp'): void {
+  mkdirSync(tmpDir, { recursive: true });
+}
+
+function cleanRawFiles(tmpDir = './tmp'): void {
+  ensureTmpDir(tmpDir);
+  for (const file of readdirSync(tmpDir)) {
+    if (file.startsWith('raw-') && file.endsWith('.json')) {
+      rmSync(`${tmpDir}/${file}`, { force: true });
+    }
+  }
+}
+
+function logFetchError(sourceName: string, message: string, tmpDir = './tmp'): void {
+  ensureTmpDir(tmpDir);
+  const timestamp = new Date().toISOString();
+  appendFileSync(`${tmpDir}/fetch-errors.log`, `[${timestamp}] ${sourceName}: ${message}\n`, 'utf8');
+}
+
 export async function runSequentially(request: string): Promise<string> {
   if (!checkNewsAvailable()) {
     throw new Error('news 命令不可用，请先执行 npm run build && npm link');
@@ -34,6 +53,8 @@ export async function runSequentially(request: string): Promise<string> {
   const plan = parseRequest(request);
   writePlan(plan);
 
+  cleanRawFiles();
+
   for (const source of plan.sources) {
     try {
       // fetchSourceToFile 是同步函数，直接调用即可
@@ -41,6 +62,7 @@ export async function runSequentially(request: string): Promise<string> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       console.error(`[warning] 跳过来源 "${source.name}": ${message}`);
+      logFetchError(source.name, message);
     }
   }
 

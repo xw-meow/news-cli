@@ -3,6 +3,7 @@ import * as esbuild from 'esbuild';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { readdirSync, statSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -23,10 +24,17 @@ await esbuild.build({
 
 console.log('Build complete: dist/index.js');
 
-const skillDir = join(__dirname, '..', 'skills', '专业日报编写');
+const skillsDir = join(__dirname, '..', 'skills');
 const tsc = join(__dirname, '..', 'node_modules', '.bin', 'tsc');
-execSync(`"${tsc}" -p tsconfig.build.json`, {
-  cwd: skillDir,
-  stdio: 'inherit',
-});
-console.log('Build complete: skills/专业日报编写/scripts/*.js');
+
+for (const entry of readdirSync(skillsDir)) {
+  const skillDir = join(skillsDir, entry);
+  const buildConfig = join(skillDir, 'tsconfig.build.json');
+  if (statSync(skillDir).isDirectory() && statSync(buildConfig).isFile()) {
+    execSync(`"${tsc}" -p tsconfig.build.json`, {
+      cwd: skillDir,
+      stdio: 'inherit',
+    });
+    console.log(`Build complete: skills/${entry}/scripts/*.js`);
+  }
+}

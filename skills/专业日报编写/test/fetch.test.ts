@@ -1,46 +1,46 @@
 import { describe, it, expect, vi } from 'vitest';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { existsSync, readFileSync, rmSync } from 'fs';
-import { fetchSource, buildCommand, fetchSourceToFile } from '../scripts/fetch.js';
+import { fetchSource, buildArgs, fetchSourceToFile } from '../scripts/fetch.js';
 
 vi.mock('child_process', async (importOriginal) => {
   const mod = await importOriginal<typeof import('child_process')>();
   return {
     ...mod,
-    execSync: vi.fn(),
+    execFileSync: vi.fn(),
   };
 });
 
-describe('buildCommand', () => {
-  it('构建无分类的命令', () => {
-    const cmd = buildCommand({ name: 'aibase', category: null, limit: 20, keywords: 'AI' });
-    expect(cmd).toBe('news get aibase -l 20 -k "AI" --json');
+describe('buildArgs', () => {
+  it('构建无分类的参数', () => {
+    const args = buildArgs({ name: 'aibase', category: null, limit: 20, keywords: 'AI' });
+    expect(args).toEqual(['get', 'aibase', '-l', '20', '-k', 'AI', '--json']);
   });
 
-  it('构建带分类的命令', () => {
-    const cmd = buildCommand({ name: '36kr', category: 'AI', limit: 10, keywords: null });
-    expect(cmd).toBe('news get 36kr -c AI -l 10 --json');
+  it('构建带分类的参数', () => {
+    const args = buildArgs({ name: '36kr', category: 'AI', limit: 10, keywords: null });
+    expect(args).toEqual(['get', '36kr', '-c', 'AI', '-l', '10', '--json']);
   });
 });
 
 describe('fetchSource', () => {
   it('mock 返回 NewsArticle 数组', () => {
     const mockArticle = { id: '1', title: 'T', url: 'https://example.com', source: 'aibase', snippet: 'S', publishedAt: null, category: null, imageUrl: null };
-    vi.mocked(execSync).mockReturnValue(JSON.stringify([mockArticle]));
+    vi.mocked(execFileSync).mockReturnValue(JSON.stringify([mockArticle]));
 
     const result = fetchSource({ name: 'aibase', category: null, limit: 20, keywords: null });
 
     expect(result).toHaveLength(1);
     expect(result[0].title).toBe('T');
-    expect(execSync).toHaveBeenCalledWith('news get aibase -l 20 --json', {
+    expect(execFileSync).toHaveBeenCalledWith('news', ['get', 'aibase', '-l', '20', '--json'], {
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'pipe'],
     });
   });
 
   it('news 不可用时抛出清晰错误', () => {
-    vi.mocked(execSync).mockImplementation((cmd) => {
-      if (cmd === 'command -v news') {
+    vi.mocked(execFileSync).mockImplementation((file) => {
+      if (file === 'news') {
         const err = new Error('command not found');
         (err as NodeJS.ErrnoException).code = 'ENOENT';
         throw err;
@@ -53,9 +53,9 @@ describe('fetchSource', () => {
     );
   });
 
-  it('execSync 非零退出时抛出带上下文的错误', () => {
-    vi.mocked(execSync).mockImplementation((cmd) => {
-      if (cmd === 'command -v news') return '';
+  it('execFileSync 非零退出时抛出带上下文的错误', () => {
+    vi.mocked(execFileSync).mockImplementation((file, args) => {
+      if (args?.[0] === '--version') return '';
       const err = new Error('Command failed');
       Object.assign(err, { status: 1, stderr: Buffer.from('network error') });
       throw err;
@@ -67,8 +67,8 @@ describe('fetchSource', () => {
   });
 
   it('JSON 解析失败时抛出带上下文的错误', () => {
-    vi.mocked(execSync).mockImplementation((cmd) => {
-      if (cmd === 'command -v news') return '';
+    vi.mocked(execFileSync).mockImplementation((file, args) => {
+      if (args?.[0] === '--version') return '';
       return 'not-json';
     });
 
@@ -81,7 +81,7 @@ describe('fetchSource', () => {
 describe('fetchSourceToFile', () => {
   it('将文章写入文件并返回路径', () => {
     const mockArticle = { id: '1', title: 'T', url: 'https://example.com', source: 'aibase', snippet: 'S', publishedAt: null, category: null, imageUrl: null };
-    vi.mocked(execSync).mockReturnValue(JSON.stringify([mockArticle]));
+    vi.mocked(execFileSync).mockReturnValue(JSON.stringify([mockArticle]));
 
     const outDir = './tmp-test-fetch';
     const path = fetchSourceToFile({ name: 'aibase', category: null, limit: 20, keywords: null }, outDir);

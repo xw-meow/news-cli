@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { writeFileSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
 import type { SourcePlan } from './plan.js';
@@ -14,28 +14,28 @@ export interface NewsArticle {
   imageUrl: string | null;
 }
 
-export function buildCommand(plan: SourcePlan): string {
-  const parts = ['news', 'get', plan.name];
-  if (plan.category) parts.push('-c', plan.category);
-  parts.push('-l', String(plan.limit));
-  if (plan.keywords) parts.push('-k', `"${plan.keywords}"`);
-  parts.push('--json');
-  return parts.join(' ');
+export function buildArgs(plan: SourcePlan): string[] {
+  const args = ['get', plan.name];
+  if (plan.category) args.push('-c', plan.category);
+  args.push('-l', String(plan.limit));
+  if (plan.keywords) args.push('-k', plan.keywords);
+  args.push('--json');
+  return args;
 }
 
 export function fetchSource(plan: SourcePlan): NewsArticle[] {
   try {
-    execSync('command -v news', { encoding: 'utf8', stdio: 'ignore' });
+    execFileSync('news', ['--version'], { encoding: 'utf8', stdio: 'ignore' });
   } catch {
     throw new Error(
       'The `news` CLI is not available in PATH. Please run `npm run build && npm link` from the project root.',
     );
   }
 
-  const cmd = buildCommand(plan);
+  const args = buildArgs(plan);
   let output: string;
   try {
-    output = execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+    output = execFileSync('news', args, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
   } catch (err) {
     const status = err instanceof Error && 'status' in err ? (err as { status: number | null }).status : null;
     const stderr = err instanceof Error && 'stderr' in err ? String((err as { stderr: Buffer | string }).stderr) : '';
