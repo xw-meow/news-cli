@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { parseRequest, writePlan, type PlanResult } from './plan.js';
 import { fetchSourceToFile } from './fetch.js';
 import { selectArticles, writeSelected, type SelectedArticles } from './dedup.js';
@@ -9,7 +9,7 @@ import type { NewsArticle } from './fetch.js';
 
 export function checkNewsAvailable(): boolean {
   try {
-    execSync('news --version', { encoding: 'utf8', stdio: 'ignore' });
+    execFileSync('news', ['--version'], { encoding: 'utf8', stdio: 'ignore' });
     return true;
   } catch {
     return false;

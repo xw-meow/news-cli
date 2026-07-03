@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { mkdtempSync, rmSync, mkdirSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -9,7 +9,7 @@ vi.mock('child_process', async (importOriginal) => {
   const mod = await importOriginal<typeof import('child_process')>();
   return {
     ...mod,
-    execSync: vi.fn(),
+    execFileSync: vi.fn(),
   };
 });
 
@@ -83,8 +83,8 @@ describe('runSequentially', () => {
     process.chdir(tmpDir);
     mkdirSync('./tmp', { recursive: true });
 
-    vi.mocked(execSync).mockImplementation((cmd: string) => {
-      if (cmd === 'news --version') return '0.1.0\n';
+    vi.mocked(execFileSync).mockImplementation((cmd: string, args?: readonly string[]) => {
+      if (cmd === 'news' && args?.[0] === '--version') return '0.1.0\n';
       return '';
     });
 
@@ -135,7 +135,7 @@ describe('runSequentially', () => {
   });
 
   it('news 命令不可用时抛出清晰错误', async () => {
-    vi.mocked(execSync).mockImplementation(() => {
+    vi.mocked(execFileSync).mockImplementation(() => {
       const err = new Error('command not found');
       (err as NodeJS.ErrnoException).code = 'ENOENT';
       throw err;
