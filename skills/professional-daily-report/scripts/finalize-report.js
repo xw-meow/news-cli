@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 // skills/professional-daily-report/scripts/finalize-report.js
 // Reads ./tmp/report-content.md + ./tmp/selected-articles.json,
-// prepends metadata and appends source stats / generation footer,
-// then writes the final file named in report-plan.json.
+// appends a generation footer, then writes the final file named in report-plan.json.
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
@@ -67,18 +66,6 @@ function main() {
   const parentDir = dirname(outputFile);
   if (parentDir && !existsSync(parentDir)) mkdirSync(parentDir, { recursive: true });
 
-  const metadata = `---
-topic: ${plan.topic}
-audience: ${plan.audience || '对该主题感兴趣的读者'}
-style: ${plan.style || '平衡'}
-length: ${plan.length || '中'}
-keywords: ${(plan.keywords || []).join(', ')}
-generatedAt: ${formatDateTime(new Date())}
-totalArticles: ${articles.length}
----
-
-`;
-
   const sourceStats = buildSourceStats(articles);
   const footer = `
 
@@ -87,7 +74,7 @@ totalArticles: ${articles.length}
 生成于 ${formatDateTime(new Date())} · 由 news-cli + professional-daily-report skill 生成
 `;
 
-  const finalContent = metadata + body + footer;
+  const finalContent = body + footer;
   writeFileSync(outputFile, finalContent, 'utf8');
   console.error(`[finalize] wrote ${outputFile} (${articles.length} articles)`);
 }
