@@ -15,6 +15,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "node scripts/build.js",
+    "packskills": "node scripts/packskills.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src/ test/",
