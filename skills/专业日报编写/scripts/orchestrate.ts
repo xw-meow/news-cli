@@ -35,8 +35,13 @@ export async function runSequentially(request: string): Promise<string> {
   writePlan(plan);
 
   for (const source of plan.sources) {
-    // fetchSourceToFile 是同步函数，直接调用即可
-    fetchSourceToFile(source);
+    try {
+      // fetchSourceToFile 是同步函数，直接调用即可
+      fetchSourceToFile(source);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[warning] 跳过来源 "${source.name}": ${message}`);
+    }
   }
 
   const articles = loadRawArticles();

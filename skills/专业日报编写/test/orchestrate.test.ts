@@ -3,7 +3,7 @@ import { execSync } from 'child_process';
 import { mkdtempSync, rmSync, mkdirSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { runSequentially } from '../scripts/orchestrate.js';
+import { runSequentially } from '../dist/scripts/orchestrate.js';
 
 vi.mock('child_process', async (importOriginal) => {
   const mod = await importOriginal<typeof import('child_process')>();
@@ -13,34 +13,34 @@ vi.mock('child_process', async (importOriginal) => {
   };
 });
 
-vi.mock('../scripts/plan.js', () => ({
+vi.mock('../dist/scripts/plan.js', () => ({
   parseRequest: vi.fn(),
   writePlan: vi.fn(),
 }));
 
-vi.mock('../scripts/fetch.js', () => ({
+vi.mock('../dist/scripts/fetch.js', () => ({
   fetchSourceToFile: vi.fn(),
 }));
 
-vi.mock('../scripts/dedup.js', () => ({
+vi.mock('../dist/scripts/dedup.js', () => ({
   selectArticles: vi.fn(),
   writeSelected: vi.fn(),
 }));
 
-vi.mock('../scripts/generate.js', () => ({
+vi.mock('../dist/scripts/generate.js', () => ({
   generateReport: vi.fn(),
   writeReport: vi.fn(),
 }));
 
-vi.mock('../scripts/finalize.js', () => ({
+vi.mock('../dist/scripts/finalize.js', () => ({
   finalizeReport: vi.fn(),
 }));
 
-import { parseRequest, writePlan, type PlanResult } from '../scripts/plan.js';
-import { fetchSourceToFile } from '../scripts/fetch.js';
-import { selectArticles, writeSelected, type SelectedArticle } from '../scripts/dedup.js';
-import { generateReport, writeReport } from '../scripts/generate.js';
-import { finalizeReport } from '../scripts/finalize.js';
+import { parseRequest, writePlan, type PlanResult } from '../dist/scripts/plan.js';
+import { fetchSourceToFile } from '../dist/scripts/fetch.js';
+import { selectArticles, writeSelected, type SelectedArticle } from '../dist/scripts/dedup.js';
+import { generateReport, writeReport } from '../dist/scripts/generate.js';
+import { finalizeReport } from '../dist/scripts/finalize.js';
 
 describe('runSequentially', () => {
   let tmpDir: string;
