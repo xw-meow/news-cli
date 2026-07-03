@@ -120,6 +120,25 @@ export function CheckIcon(props: IconProps) {
   );
 }
 
+export function SparklesIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
+    </Icon>
+  );
+}
+
+export function NewspaperIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M7 7h10" />
+      <path d="M7 11h10" />
+      <path d="M7 15h6" />
+    </Icon>
+  );
+}
+
 export function NumberIcon({ number, ...props }: IconProps & { number: number }) {
   return (
     <svg

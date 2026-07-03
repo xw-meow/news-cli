@@ -7,16 +7,17 @@ export const ui = {
     install: '安装',
     commands: '命令',
     sources: '新闻源',
+    skills: 'Skills',
 
     // Footer
     footerBuilt: '用 React + Vite + Tailwind 构建',
 
     // Home
-    heroTag: '17 个新闻源 · CLI 工具 · 插件扩展',
+    heroTag: '17 个新闻源 · CLI 工具 · 插件扩展 · AI 日报',
     heroTitle1: '命令行里的',
     heroTitle2: '新闻聚合器',
     heroDesc:
-      '一条命令聚合 17 个新闻源。支持分类浏览、关键词过滤、JSON 输出、插件扩展，以及自动代理识别。',
+      '一条命令聚合 17 个新闻源。支持分类浏览、关键词过滤、JSON 输出、插件扩展，以及 AI 自动生成日报。',
     ctaStart: '快速开始',
     ctaCommands: '命令参考',
     statSources: '新闻源',
@@ -58,6 +59,19 @@ export const ui = {
     emptyTitle: '没有匹配的新闻源',
     clearFilter: '清除筛选',
 
+    // Skills
+    skillsPageTitle: 'Skills',
+    skillsPageSubtitle: '让 AI 用 news-cli 自动生成日报',
+    skillInstallTitle: '安装 Skill',
+    skillInstallDesc: '如果你在使用 OpenCode，让 AI 执行下面命令下载并安装：',
+    skillUsageTitle: '使用示例',
+    skillOutputTitle: '输出格式',
+    skillMarkdownTitle: 'Markdown 日报',
+    skillMarkdownDesc: '适合博客、Newsletter 或飞书文档，包含导语、分栏、观点、来源统计。',
+    skillHtmlTitle: 'HTML 大字报',
+    skillHtmlDesc: '单文件 HTML，旧报纸 / 大字报风格，适合分享或打印成海报。',
+    skillDetailLink: '查看 SKILL.md 完整说明 →',
+
     // NotFound
     notFoundTitle: '404',
     notFoundSubtitle: '命令未找到',
@@ -70,16 +84,17 @@ export const ui = {
     install: 'Install',
     commands: 'Commands',
     sources: 'Sources',
+    skills: 'Skills',
 
     // Footer
     footerBuilt: 'Built with React + Vite + Tailwind',
 
     // Home
-    heroTag: '17 sources · CLI tool · Plugin extensible',
+    heroTag: '17 sources · CLI tool · Plugin extensible · AI daily report',
     heroTitle1: 'A news aggregator',
     heroTitle2: 'in your terminal',
     heroDesc:
-      'Aggregate 17 news sources with one command. Categories, keyword filtering, JSON output, plugins, and automatic proxy detection.',
+      'Aggregate 17 news sources with one command. Categories, keyword filtering, JSON output, plugins, and AI auto-generated daily reports.',
     ctaStart: 'Quick Start',
     ctaCommands: 'Commands',
     statSources: 'sources',
@@ -120,6 +135,19 @@ export const ui = {
     searchPlaceholder: 'Search sources, categories…',
     emptyTitle: 'No matching sources',
     clearFilter: 'Clear filters',
+
+    // Skills
+    skillsPageTitle: 'Skills',
+    skillsPageSubtitle: 'Let AI generate daily reports with news-cli',
+    skillInstallTitle: 'Install the Skill',
+    skillInstallDesc: 'If you are using OpenCode, ask your AI to run:',
+    skillUsageTitle: 'Usage Examples',
+    skillOutputTitle: 'Output Formats',
+    skillMarkdownTitle: 'Markdown Report',
+    skillMarkdownDesc: 'Great for blogs, newsletters, or Lark docs. Includes intro, sections, opinions, and source stats.',
+    skillHtmlTitle: 'HTML Poster',
+    skillHtmlDesc: 'Self-contained HTML with old-newspaper / poster style. Great for sharing or printing.',
+    skillDetailLink: 'See full SKILL.md →',
 
     // NotFound
     notFoundTitle: '404',

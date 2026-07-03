@@ -12,6 +12,7 @@ export function Header() {
     { to: '/install', label: t.install },
     { to: '/commands', label: t.commands },
     { to: '/sources', label: t.sources },
+    { to: '/skills', label: t.skills },
   ];
 
   const toggleLang = () => setLang(lang === 'zh' ? 'en' : 'zh');
