@@ -6,6 +6,7 @@ import { InstallPage } from './pages/InstallPage';
 import { CommandsPage } from './pages/CommandsPage';
 import { SourcesPage } from './pages/SourcesPage';
 import { SkillsPage } from './pages/SkillsPage';
+import { SkillDetailPage } from './pages/SkillDetailPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 export function App() {
@@ -19,6 +20,7 @@ export function App() {
           <Route path="/commands" element={<CommandsPage />} />
           <Route path="/sources" element={<SourcesPage />} />
           <Route path="/skills" element={<SkillsPage />} />
+          <Route path="/skills/:id" element={<SkillDetailPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
