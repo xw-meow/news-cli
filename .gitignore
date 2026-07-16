@@ -11,3 +11,6 @@ site/tsconfig.tsbuildinfo
 skills/**/node_modules
 skills/**/dist
 skills/**/tmp
+
+# Git worktrees
+.worktrees
