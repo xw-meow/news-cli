@@ -16,6 +16,7 @@ import { peopleCnSource } from './news-source/people-cn/index.js';
 import { huxiuSource } from './news-source/huxiu/index.js';
 import { yicaiSource } from './news-source/yicai/index.js';
 import { autohomeSource } from './news-source/autohome/index.js';
+import { qbitaiSource } from './news-source/qbitai/index.js';
 import { bbcSource } from './news-source/bbc/index.js';
 import { hackernewsSource } from './news-source/hackernews/index.js';
 
@@ -35,6 +36,7 @@ registerSource(peopleCnSource);
 registerSource(huxiuSource);
 registerSource(yicaiSource);
 registerSource(autohomeSource);
+registerSource(qbitaiSource);
 registerSource(bbcSource);
 registerSource(hackernewsSource);
 
